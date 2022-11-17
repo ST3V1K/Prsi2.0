@@ -12,9 +12,10 @@
       <LineBreak/>×<LineBreak/>
       {OppenentName}
     </TextBlock>
+    <Button Name="BtnQuit" IsCancel="true" VerticalAlignment="Top" HorizontalAlignment="Left" Click="BtnQuit_Click">Opustit hru</Button>
     <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0">
-      <Button Name="BtnSkip"  Width="Auto">Stojím</Button>
-      <Button Name="BtnCannotPlay"  Width="Auto">Nemohu hrát</Button>
+      <Button Name="BtnCannotPlay"  Width="Auto" Click="BtnCannotPlay_Click">Nemohu hrát</Button>
     </StackPanel>
+    <Ellipse x:Name="ellipse" Margin="5" Width="15" Height="15" Fill="White" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
   </Grid>
 </UserControl>

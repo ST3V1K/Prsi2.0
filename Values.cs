@@ -5,6 +5,11 @@ namespace Prsi
 {
     public static class Values
     {
+        public enum Players
+        {
+            Player, Opponent
+        }
+
         internal const string CONNECTION_STRING = "User Id = hrac; Password = heslo; Server = db.udfszyxwuvjzxhptzout.supabase.co; Port = 5432; Database = postgres";
         private static string? playerName;
         private static string? playerPassword;
@@ -90,5 +95,11 @@ namespace Prsi
         }
 
         public static Card CardBack { get => new("zdk", Properties.Resources.zdk); }
+
+        private readonly static MainMenu mainMenu = new();
+        public static MainMenu GetMainMenu() {
+            mainMenu.SetName();
+            return mainMenu; 
+        }
     }
 }

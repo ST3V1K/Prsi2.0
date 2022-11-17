@@ -1,5 +1,4 @@
 ﻿using Npgsql;
-using Prsi.Menu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +51,7 @@ namespace Prsi
                     await Values.Connection_Listen.OpenAsync();
                     if (Switcher.PageSwitcher != null)
                     {
-                        Values.Connection_Listen.Notification += Listener.HandleListen;
+                        Values.Connection_Listen.Notification += async (o, e) => await Listener.HandleListen(o, e);
                         Server2 = true;
                     }
                 }
@@ -74,7 +73,7 @@ namespace Prsi
                 ChangeName changeName = new() { Owner = Switcher.PageSwitcher };
                 changeName.ShowDialog();
 
-                Switcher.Switch(new MainMenu());
+                Switcher.Switch(Values.GetMainMenu());
 
                 if (!Values.IsFormClosed)
                     using (NpgsqlCommand cmd = new($"LISTEN \"{Values.Channel}\";", Values.Connection_Listen))

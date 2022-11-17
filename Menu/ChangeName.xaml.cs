@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 
-namespace Prsi.Menu
+namespace Prsi
 {
     /// <summary>
     /// Interakční logika pro ChangeName.xaml

@@ -29,7 +29,7 @@ namespace Prsi
 
         private void BtnReturn_Click(object sender, RoutedEventArgs e)
         {
-            Switcher.Switch(new MainMenu());
+            Switcher.Switch(Values.GetMainMenu());
         }
 
         private async void Grid_Loaded(object sender, RoutedEventArgs e)

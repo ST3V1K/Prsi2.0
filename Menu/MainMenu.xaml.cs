@@ -1,5 +1,4 @@
 ﻿using Npgsql;
-using Prsi.Menu;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -27,9 +26,13 @@ namespace Prsi
         public MainMenu()
         {
             InitializeComponent();
+        }
+
+        public void SetName()
+        {
             try
             {
-                lbName.Content = Values.PlayerName;
+                Dispatcher.Invoke(() => lbName.Content = Values.PlayerName);
             }
             catch (NoNameException) { }
         }

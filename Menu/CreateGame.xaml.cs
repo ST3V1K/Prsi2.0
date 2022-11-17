@@ -34,7 +34,7 @@ namespace Prsi
             cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
             cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
             await cmd.ExecuteNonQueryAsync();
-            Switcher.Switch(new MainMenu());
+            Switcher.Switch(Values.GetMainMenu());
         }
     }
 }
