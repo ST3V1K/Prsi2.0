@@ -12,5 +12,9 @@
       <LineBreak/>×<LineBreak/>
       {OppenentName}
     </TextBlock>
+    <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0">
+      <Button Name="BtnSkip"  Width="Auto">Stojím</Button>
+      <Button Name="BtnCannotPlay"  Width="Auto">Nemohu hrát</Button>
+    </StackPanel>
   </Grid>
 </UserControl>

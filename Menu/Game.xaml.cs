@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
@@ -24,11 +25,12 @@ namespace Prsi
     /// </summary>
     public partial class Game : UserControl
     {
+        public string? LastPlayed { get; private set; }
+
         private Random? r = null;
 
-        public int Seed { get; private set; }
-
-        public List<Card> cards = new();
+        private readonly List<Card> thrownOut = new();
+        private readonly List<Card> cards = new();
         private List<Card> deck = new();
 
         public Game()
@@ -38,11 +40,11 @@ namespace Prsi
 
         public void StartGame(int seed, string opponentName, bool host)
         {
-            Seed = seed;
             r = new(seed);
             Dispatcher.Invoke(() => txtNames.Text = $"{Values.PlayerName}\n×\n{opponentName}");
 
             deck = ((Card[])Values.Cards.Clone()).ToList();
+            cards.Clear();
 
             for (int i = 0; i < 4; i++)
             {
@@ -97,7 +99,7 @@ namespace Prsi
             Card card = deck[index];
 
             if (deck.Count == 0)
-                deck = (List<Card>)Values.Cards.Clone();
+                NewDeck();
             deck.RemoveAt(index);
 
             cards.Add(card);
@@ -113,22 +115,37 @@ namespace Prsi
             int index = r.Next(deck.Count);
 
             if (deck.Count == 0)
-                deck = (List<Card>)Values.Cards.Clone();
+                NewDeck();
             deck.RemoveAt(index);
 
         }
 
-        public void PlayCard(Card card)
+        public async void PlayCard(Card card)
         {
+            using NpgsqlCommand cmd = new("select tahni(@jmenoin, @hesloin, @tahin)", Values.Connection);
+            cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+            cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+            cmd.Parameters.AddWithValue("@tahin", card.Name);
+            await cmd.ExecuteNonQueryAsync();
+
             cards.Remove(card);
+            thrownOut.Add(card);
+            LastPlayed = card.Name;
             VisualizeCards();
         }
 
         public void RemoveCardFromDeck(string name)
         {
             if (deck.Count == 0)
-                deck = (List<Card>)Values.Cards.Clone();
-            deck.RemoveAll(c => c.Name == name);
+                NewDeck();
+            deck.RemoveAll(c =>
+            {
+                thrownOut.Add(c);
+                return c.Name == name;
+            }
+            );
         }
+
+        private void NewDeck() => deck = thrownOut.GetRange(0, thrownOut.Count);
     }
 }
