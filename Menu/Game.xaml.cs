@@ -30,7 +30,7 @@ namespace Prsi
 
         public List<Card> cards = new();
         private List<Card> deck = new();
-        private List<Card> ec = new();
+
         public Game()
         {
             InitializeComponent();
@@ -57,12 +57,6 @@ namespace Prsi
                     DrawCard();
                 }
             }
-            string a = "";
-            foreach (Card c in ec) 
-            {
-                a += c.Name + " ";
-            }
-            MessageBox.Show(a);
         }
 
         public void VisualizeCards()
@@ -96,6 +90,9 @@ namespace Prsi
 
         public void DrawCard()
         {
+            if (r == null)
+                return;
+
             int index = r.Next(deck.Count);
             Card card = deck[index];
 
@@ -110,8 +107,11 @@ namespace Prsi
 
         public void DrawCardForEnemy()
         {
+            if (r == null)
+                return;
+
             int index = r.Next(deck.Count);
-            ec.Add(deck[index]);
+
             if (deck.Count == 0)
                 deck = (List<Card>)Values.Cards.Clone();
             deck.RemoveAt(index);

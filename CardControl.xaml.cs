@@ -75,13 +75,13 @@ namespace Prsi
         private void Card_MouseEnter(object sender, MouseEventArgs e)
         {
             border.BorderBrush = Brushes.Black;
-            Panel.SetZIndex(border, 99);
+            Panel.SetZIndex(this, 99);
         }
 
         private void Card_MouseLeave(object sender, MouseEventArgs e)
         {
             border.BorderBrush = null;
-            Panel.SetZIndex(border, Index);
+            Panel.SetZIndex(this, Index);
         }
     }
 }
