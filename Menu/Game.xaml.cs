@@ -24,51 +24,111 @@ namespace Prsi
     /// </summary>
     public partial class Game : UserControl
     {
+        private Random? r = null;
+
         public int Seed { get; private set; }
 
         public List<Card> cards = new();
-
+        private List<Card> deck = new();
+        private List<Card> ec = new();
         public Game()
         {
             InitializeComponent();
         }
 
-        public void CreateGame(int seed, string opponentName)
+        public void StartGame(int seed, string opponentName, bool host)
         {
             Seed = seed;
+            r = new(seed);
             Dispatcher.Invoke(() => txtNames.Text = $"{Values.PlayerName}\n×\n{opponentName}");
-        }
 
-        public void DrawCards()
-        {
-            grid.Children.Clear();
-            for (int i = 0; i < cards.Count; i++)
+            deck = ((Card[])Values.Cards.Clone()).ToList();
+
+            for (int i = 0; i < 4; i++)
             {
-                double angle = i * 180 / cards.Count + 90 / cards.Count - 90;
-
-                var transformGroup = new TransformGroup();
-
-                transformGroup.Children.Add(new RotateTransform(angle));
-
-                CardControl cardControl = new(cards[i], i + 1, angle)
+                if (host)
                 {
-                    Width = 120,
-                    Height = 200,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    RenderTransformOrigin = new Point(.5, 1),
-                    RenderTransform = transformGroup
-                };
-                
-                grid.Children.Add(cardControl);
-                Panel.SetZIndex(cardControl, cardControl.Index);
+                    DrawCard();
+                    DrawCardForEnemy();
+                }
+                else
+                {
+                    DrawCardForEnemy();
+                    DrawCard();
+                }
             }
+            string a = "";
+            foreach (Card c in ec) 
+            {
+                a += c.Name + " ";
+            }
+            MessageBox.Show(a);
         }
 
-        public void AddCard(Card card)
+        public void VisualizeCards()
         {
+            Dispatcher.Invoke(() =>
+            {
+                grid.Children.Clear();
+                for (int i = 0; i < cards.Count; i++)
+                {
+                    double angle = i * 180 / cards.Count + 90 / cards.Count - 90;
+
+                    var transformGroup = new TransformGroup();
+
+                    transformGroup.Children.Add(new RotateTransform(angle));
+
+                    CardControl cardControl = new(cards[i], i + 1, angle)
+                    {
+                        Width = 120,
+                        Height = 200,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Bottom,
+                        RenderTransformOrigin = new Point(.5, 1),
+                        RenderTransform = transformGroup
+                    };
+
+                    grid.Children.Add(cardControl);
+                    Panel.SetZIndex(cardControl, cardControl.Index);
+                }
+            });
+        }
+
+        public void DrawCard()
+        {
+            int index = r.Next(deck.Count);
+            Card card = deck[index];
+
+            if (deck.Count == 0)
+                deck = (List<Card>)Values.Cards.Clone();
+            deck.RemoveAt(index);
+
             cards.Add(card);
-            DrawCards();
+
+            VisualizeCards();
+        }
+
+        public void DrawCardForEnemy()
+        {
+            int index = r.Next(deck.Count);
+            ec.Add(deck[index]);
+            if (deck.Count == 0)
+                deck = (List<Card>)Values.Cards.Clone();
+            deck.RemoveAt(index);
+
+        }
+
+        public void PlayCard(Card card)
+        {
+            cards.Remove(card);
+            VisualizeCards();
+        }
+
+        public void RemoveCardFromDeck(string name)
+        {
+            if (deck.Count == 0)
+                deck = (List<Card>)Values.Cards.Clone();
+            deck.RemoveAll(c => c.Name == name);
         }
     }
 }

@@ -42,7 +42,7 @@ namespace Prsi
             if (seed == -1)
                 return;
 
-            Values.Game.CreateGame(seed, hostingPlayerName);
+            Values.Game.StartGame(seed, hostingPlayerName, false);
             Switcher.Switch(Values.Game);
         }
     }

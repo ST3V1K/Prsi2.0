@@ -53,7 +53,7 @@ namespace Prsi
                 if (Selected)
                 {
                     Values.Game?.cards.Remove(Card);
-                    Values.Game?.DrawCards();
+                    Values.Game?.VisualizeCards();
                 }
 
                 Selected = true;

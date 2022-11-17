@@ -18,7 +18,7 @@ namespace Prsi
                 int seed = int.Parse(info[1]);
                 string opponentName = info[2];
 
-                Values.Game.CreateGame(seed, opponentName);
+                Values.Game.StartGame(seed, opponentName, true);
                 Switcher.Switch(Values.Game);
             }
         }
