@@ -25,6 +25,7 @@ namespace Prsi
         {
             InitializeComponent();
             lbName.Content = Values.PlayerName;
+            // TODO: listen if someone joins
         }
 
         private async void BtnReturn_Click(object sender, RoutedEventArgs e)

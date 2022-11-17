@@ -13,6 +13,8 @@ namespace Prsi
 
         public static NpgsqlConnection? Connection_Listen { get; set; }
 
+        private static readonly Game game = new();
+
         public static string PlayerName
         {
             get
@@ -41,9 +43,7 @@ namespace Prsi
 
         public static CancellationToken FormClosedToken { get => new(IsFormClosed); }
 
-        public static int GameSeed { get; set; }
-
-        public static Game? Game { get; set; }
+        public static Game Game { get => game; }
 
         public static int MOVE_LENGTH { get => 30; }
     }

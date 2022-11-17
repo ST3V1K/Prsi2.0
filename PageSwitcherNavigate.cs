@@ -7,7 +7,7 @@ namespace Prsi
     {
         public void Navigate(UserControl nextPage)
         {
-            Content = nextPage;
+            Dispatcher.Invoke(() => Content = nextPage);            
         }
     }
 }

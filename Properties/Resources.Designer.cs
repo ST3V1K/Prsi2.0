@@ -63,6 +63,16 @@ namespace Prsi.Properties {
         /// <summary>
         ///   Vyhledává lokalizovaný prostředek typu System.Byte[].
         /// </summary>
+        internal static byte[] icon {
+            get {
+                object obj = ResourceManager.GetObject("icon", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Vyhledává lokalizovaný prostředek typu System.Byte[].
+        /// </summary>
         internal static byte[] k10 {
             get {
                 object obj = ResourceManager.GetObject("k10", resourceCulture);

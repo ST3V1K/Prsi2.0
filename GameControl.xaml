@@ -8,6 +8,6 @@
              d:DesignHeight="25" d:DesignWidth="300">
   <Grid Height="25" Width="300">
     <Label x:Name="lbHostingPlayerName" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="9pt" Margin="5,1,0,1" Padding="0">● {Hosting Player Name}</Label>
-    <Button HorizontalAlignment="Right" Padding="0" Margin="1" FontSize="9pt">Připojit</Button>
+    <Button Name="BtnJoin" HorizontalAlignment="Right" Padding="0" Margin="1" FontSize="9pt" Click="BtnJoin_Click">Připojit</Button>
   </Grid>
 </UserControl>

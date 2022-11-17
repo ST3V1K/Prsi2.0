@@ -39,29 +39,45 @@ namespace Prsi
 
         private async void BtnVyhledat_Click(object sender, RoutedEventArgs e)
         {
-            await LoadGames(txtFilter.Text);
+            if (txtFilter.Text == string.Empty)
+                await LoadGames();
+            else
+                await LoadGames(txtFilter.Text);
         }
 
         private async Task LoadGames()
         {
-            gamesBox.Children.Clear();
             using NpgsqlCommand cmd = new("select zobraz_hrace(@jmenoin, @hesloin)", Values.Connection);
             cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
             cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
             using var reader = await cmd.ExecuteReaderAsync();
+            gamesBox.Children.Clear();
             while (reader.Read())
                 gamesBox.Children.Add(new GameControl(reader.GetString(0)));
+            if (gamesBox.Children.Count == 0)
+                gamesBox.Children.Add(new TextBlock()
+                {
+                    Text = "Nebyla nalezena žádná hra.\nZkuste to poději.",
+                    TextAlignment = TextAlignment.Center
+                });
         }
         private async Task LoadGames(string filter)
         {
-            gamesBox.Children.Clear();
             using NpgsqlCommand cmd = new("select * from zobraz_hrace(@jmenoin, @hesloin) where jmena like @filter", Values.Connection);
             cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
             cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
             cmd.Parameters.AddWithValue("@filter", filter + '%');
             using var reader = await cmd.ExecuteReaderAsync();
+            gamesBox.Children.Clear();
             while (reader.Read())
                 gamesBox.Children.Add(new GameControl(reader.GetString(0)));
+            if (gamesBox.Children.Count == 0)
+                gamesBox.Children.Add(new TextBlock()
+                {
+                    Text =
+                    "Nebyla nalezena žádná hra.\nMůžete zkusit jiný filtr nebo to zkusit později",
+                    TextAlignment = TextAlignment.Center
+                });
         }
     }
 }

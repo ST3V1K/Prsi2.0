@@ -52,7 +52,7 @@ namespace Prsi
                     await Values.Connection_Listen.OpenAsync();
                     if (Switcher.PageSwitcher != null)
                     {
-                        Values.Connection_Listen.Notification += Switcher.PageSwitcher.HandleListen;
+                        Values.Connection_Listen.Notification += Listener.HandleListen;
                         Server2 = true;
                     }
                 }

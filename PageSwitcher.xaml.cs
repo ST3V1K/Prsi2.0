@@ -38,11 +38,6 @@ namespace Prsi
             Timer.Tick += MakeUserActive;
         }
 
-        public void HandleListen(object o, NpgsqlNotificationEventArgs e)
-        {
-            MessageBox.Show(e.Payload);
-        }
-
         private async void MakeUserActive(object? sender, EventArgs e)
         {
             await using NpgsqlCommand cmd = new("select zaktivovat(@jmenoin, @hesloin)", Values.Connection);

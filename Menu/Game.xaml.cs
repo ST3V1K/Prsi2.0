@@ -24,13 +24,20 @@ namespace Prsi
     /// </summary>
     public partial class Game : UserControl
     {
+        public int Seed { get; private set; }
+
+        public List<Card> cards = new();
+
         public Game()
         {
             InitializeComponent();
-            lbName.Content = Values.PlayerName;
         }
 
-        public List<Card> cards = new();
+        public void CreateGame(int seed, string opponentName)
+        {
+            Seed = seed;
+            Dispatcher.Invoke(() => txtNames.Text = $"{Values.PlayerName}\n×\n{opponentName}");
+        }
 
         public void DrawCards()
         {
