@@ -141,6 +141,7 @@ namespace Prsi
             deck.RemoveAll(c =>
             {
                 thrownOut.Add(c);
+                LastPlayed = c.Name;
                 return c.Name == name;
             }
             );

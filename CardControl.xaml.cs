@@ -52,7 +52,7 @@ namespace Prsi
             {
                 if (Selected)
                 {
-                    Values.Game?.cards.Remove(Card);
+                    Values.Game?.PlayCard(Card);
                     Values.Game?.VisualizeCards();
                 }
 
@@ -82,6 +82,9 @@ namespace Prsi
         {
             border.BorderBrush = null;
             Panel.SetZIndex(this, Index);
+            Selected = false;
+            if (((TransformGroup)RenderTransform).Children.Count > 1)
+                ((TransformGroup)RenderTransform).Children.RemoveAt(1);
         }
     }
 }
