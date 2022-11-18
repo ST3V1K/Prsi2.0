@@ -53,7 +53,6 @@ namespace Prsi
                 if (Selected)
                 {
                     Values.Game?.PlayCard(Card);
-                    Values.Game?.VisualizeCards();
                 }
 
                 Selected = true;
@@ -61,7 +60,7 @@ namespace Prsi
                 double offY = -Values.MOVE_LENGTH * Math.Cos(Angle * (Math.PI / 180));
                 ((TransformGroup)RenderTransform).Children.Add(new TranslateTransform(offX, offY));
 
-                foreach (CardControl cc in Values.Game?.grid.Children.OfType<CardControl>().Where(c => c != this) ?? Array.Empty<CardControl>())
+                foreach (CardControl cc in Values.Game?.cardsGrid.Children.OfType<CardControl>().Where(c => c != this) ?? Array.Empty<CardControl>())
                 {
                     cc.Selected = false;
                     if (((TransformGroup)cc.RenderTransform).Children.Count > 1)
@@ -74,12 +73,14 @@ namespace Prsi
 
         private void Card_MouseEnter(object sender, MouseEventArgs e)
         {
+            Values.Game.EnlargeCardsGrid();
             border.BorderBrush = Brushes.Black;
             Panel.SetZIndex(this, 99);
         }
 
         private void Card_MouseLeave(object sender, MouseEventArgs e)
         {
+            Values.Game.ShrinkCardsGrid();  
             border.BorderBrush = null;
             Panel.SetZIndex(this, Index);
             Selected = false;

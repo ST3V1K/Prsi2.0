@@ -6,7 +6,10 @@
              xmlns:local="clr-namespace:Prsi"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-  <Grid x:Name="grid" x:FieldModifier="public">
+  <Grid x:Name="mainGrid">
+    <Image x:Name="lastPlayedImage" Width="90" Height="150"/>
+    <Grid x:Name="opponentGrid" VerticalAlignment="Top" HorizontalAlignment="Center" Height="120"/>
+    <Grid x:Name="cardsGrid" x:FieldModifier="public" VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="120"/>
     <TextBlock x:Name="txtNames" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="10" Padding="3" TextAlignment="Center">
       {PlayerName}
       <LineBreak/>×<LineBreak/>

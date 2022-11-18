@@ -38,6 +38,8 @@ namespace Prsi
         private readonly List<Card> cards = new();
         private List<Card> deck = new();
 
+        private int enemyCardCount = 0;
+
         public int CardsCount { get => cards.Count; }
 
         private Values.Players? Playing = null;
@@ -72,20 +74,21 @@ namespace Prsi
             {
                 if (host)
                 {
-                    DrawCard();
-                    DrawCardForEnemy();
+                    GiveCard();
+                    GiveCardToOpponent();
                 }
                 else
                 {
-                    DrawCardForEnemy();
-                    DrawCard();
+                    GiveCardToOpponent();
+                    GiveCard();
                 }
             }
 
             if (host) Playing = Values.Players.Player;
             else Playing = Values.Players.Opponent;
 
-            VisualizeCards();
+            VisualizePlayerCards();
+            VisualizeOpponentCards();
         }
 
         private void ChangeColorPlaying()
@@ -102,23 +105,15 @@ namespace Prsi
             });
         }
 
-        public void VisualizeCards()
+        private void VisualizePlayerCards()
         {
             Dispatcher.Invoke(() =>
             {
                 if (LastPlayed == null) return;
 
-                foreach (var c in grid.Children.OfType<CardControl>().ToList())
-                    grid.Children.Remove(c);
+                cardsGrid.Children.Clear();
 
-                grid.Children.Add(new Image()
-                {
-                    Height = 200,
-                    Width = 120,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Top,
-                    Source = LastPlayed.BitmapImage
-                });
+                lastPlayedImage.Source = LastPlayed.BitmapImage;
 
                 ChangeColorPlaying();
 
@@ -138,10 +133,58 @@ namespace Prsi
                         RenderTransform = transformGroup
                     };
 
-                    grid.Children.Add(cardControl);
+                    cardsGrid.Children.Add(cardControl);
                     Panel.SetZIndex(cardControl, cardControl.Index);
                 }
             });
+        }
+
+        private void VisualizeOpponentCards()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                if (LastPlayed == null) return;
+
+                opponentGrid.Children.Clear();
+
+                lastPlayedImage.Source = LastPlayed.BitmapImage;
+
+                ChangeColorPlaying();
+
+                for (int i = 0; i < enemyCardCount; i++)
+                {
+                    double angle = i * 180 / enemyCardCount + 90 / enemyCardCount - 90;
+
+                    var transformGroup = new TransformGroup();
+
+                    transformGroup.Children.Add(new RotateTransform(angle));
+
+                    opponentGrid.Children.Add(new Image()
+                    {
+                        RenderTransformOrigin = new Point(.5, 0),
+                        RenderTransform = transformGroup,
+                        Source = Values.CardBack.BitmapImage
+                    });
+                }
+            });
+        }
+
+        private void GiveCard()
+        {
+            if (r == null) return;
+
+            int index = r.Next(deck.Count);
+            deck.RemoveAt(index);
+            cards.Add(deck[index]);
+        }
+
+        private void GiveCardToOpponent()
+        {
+            if (r == null) return;
+
+            int index = r.Next(deck.Count);
+            deck.RemoveAt(index);
+            enemyCardCount++;
         }
 
         public void DrawCard()
@@ -159,8 +202,7 @@ namespace Prsi
             cards.Add(card);
 
             Playing = Values.Players.Opponent;
-
-            VisualizeCards();
+            VisualizePlayerCards();
         }
 
         public void DrawCardForEnemy()
@@ -173,13 +215,15 @@ namespace Prsi
             if (deck.Count == 0)
                 NewDeck();
             deck.RemoveAt(index);
+            enemyCardCount++;
 
             Playing = Values.Players.Player;
-            ChangeColorPlaying();
+            VisualizeOpponentCards();
         }
 
         public async void PlayCard(Card card)
         {
+            //bugged
             if (Playing == Values.Players.Opponent) return;
             if (!card.CanBePlayed(LastPlayed)) return;
 
@@ -200,7 +244,7 @@ namespace Prsi
             thrownOut.Add(card);
             LastPlayed = card;
             Playing = Values.Players.Opponent;
-            VisualizeCards();
+            VisualizePlayerCards();
         }
 
         public void RemoveCardFromDeck(string name)
@@ -210,12 +254,16 @@ namespace Prsi
             if (deck.Count == 0)
                 NewDeck();
             
-            Card? card = Values.Cards.Where(c =>  c.Name == name).First();
+            Card? card = Values.Cards.Where(c =>  c.Name == name).FirstOrDefault();
+
+            if (card == null) return;
+            
             thrownOut.Add(card);
             LastPlayed = card;
+            enemyCardCount--;
 
             Playing = Values.Players.Player;
-            VisualizeCards();
+            VisualizeOpponentCards();
         }
 
         private void NewDeck() => deck = thrownOut.GetRange(0, thrownOut.Count);
@@ -253,6 +301,16 @@ namespace Prsi
 
             if (LastPlayed?.Name.Contains("14") == false)
                 DrawCard();
+        }
+
+        public void EnlargeCardsGrid()
+        {
+            cardsGrid.Height = 240;
+        }
+
+        public void ShrinkCardsGrid()
+        {
+            cardsGrid.Height = 120;
         }
     }
 }
