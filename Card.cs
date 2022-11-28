@@ -8,17 +8,31 @@ namespace Prsi
 
         public BitmapImage BitmapImage { get; init; }
 
+        public char ColorCode { get; init; }
+
+        public char? ChangeToColor { get; set; }
+
+        public int Number { get; init; }
+
         public Card(string name, byte[] image)
         {
             Name = name;
             BitmapImage = image.ToBitmapImage();
+            ColorCode = name[0];
+            if (name == "zdk")
+                Number = -1;
+            else
+                Number = int.Parse(name[1..].Length <= 2 ? name[1..] : name[1..^1]);
         }
 
-        public bool CanBePlayed(Card? card)
+        public bool CanBePlayed(Card? lastPlayed)
         {
-            //bugged
-            if (card == null) return false;
-            return card.Name[0] == Name[0] || card.Name[1..] == Name[1..] || Name[1..] == "12" || !card.Name.Contains("14");
+            if (lastPlayed == null) return false;
+            return
+                (lastPlayed.ColorCode == ColorCode && lastPlayed.ChangeToColor == null && (lastPlayed.Number != 14 || lastPlayed.Number != 7)) ||
+                (lastPlayed.Number == Number && lastPlayed.ChangeToColor == null) ||
+                (Number == 12 && (lastPlayed.Number != 14 || lastPlayed.Number != 7)) ||
+                (lastPlayed.ChangeToColor == ColorCode && (lastPlayed.Number != 14 || lastPlayed.Number != 7));
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Prsi
         private void Img_MouseUp(object sender, MouseButtonEventArgs e)
         {
             Image img = (Image)sender;
-            Values.Game.ChangeTo = (string)img.Tag;
+            Values.Game.ChangeTo = ((string)img.Tag).FirstOrDefault();
             Close();
         }
     }

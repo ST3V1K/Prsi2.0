@@ -26,7 +26,7 @@ namespace Prsi
     /// </summary>
     public partial class Game : UserControl
     {
-        public string? ChangeTo { get; set; }
+        public char? ChangeTo { get; set; }
 
         public Card? LastPlayed { get; private set; }
 
@@ -43,6 +43,8 @@ namespace Prsi
         public int CardsCount { get => cards.Count; }
 
         private Values.Players? Playing = null;
+
+        public int StackedCards { get; set; }
 
         public Game()
         {
@@ -105,6 +107,24 @@ namespace Prsi
             });
         }
 
+        private void VisualizeLastPlayedCard(char? centerCardColorCode)
+        {
+            if (LastPlayed == null) return;
+
+            lastPlayedImage.Source = LastPlayed.BitmapImage;
+            if (LastPlayed.Number == 12)
+            {
+                changeColorImage.Source = centerCardColorCode switch
+                {
+                    's' => (DrawingImage)FindResource("ImageS"),
+                    'k' => (DrawingImage)FindResource("ImageK"),
+                    'l' => (DrawingImage)FindResource("ImageL"),
+                    'z' => (DrawingImage)FindResource("ImageZ"),
+                    _ => null
+                };
+            }
+        }
+
         private void VisualizePlayerCards()
         {
             Dispatcher.Invoke(() =>
@@ -112,9 +132,7 @@ namespace Prsi
                 if (LastPlayed == null) return;
 
                 cardsGrid.Children.Clear();
-
-                lastPlayedImage.Source = LastPlayed.BitmapImage;
-
+                VisualizeLastPlayedCard(ChangeTo);
                 ChangeColorPlaying();
 
                 for (int i = 0; i < cards.Count; i++)
@@ -139,16 +157,14 @@ namespace Prsi
             });
         }
 
-        private void VisualizeOpponentCards()
+        private void VisualizeOpponentCards(char? colorCode = null)
         {
             Dispatcher.Invoke(() =>
             {
                 if (LastPlayed == null) return;
 
                 opponentGrid.Children.Clear();
-
-                lastPlayedImage.Source = LastPlayed.BitmapImage;
-
+                VisualizeLastPlayedCard(colorCode);
                 ChangeColorPlaying();
 
                 for (int i = 0; i < enemyCardCount; i++)
@@ -174,8 +190,8 @@ namespace Prsi
             if (r == null) return;
 
             int index = r.Next(deck.Count);
-            deck.RemoveAt(index);
             cards.Add(deck[index]);
+            deck.RemoveAt(index);
         }
 
         private void GiveCardToOpponent()
@@ -187,43 +203,48 @@ namespace Prsi
             enemyCardCount++;
         }
 
-        public void DrawCard()
+        public void DrawCard(int amount = 1)
         {
-            if (r == null || Playing == Values.Players.Opponent)
-                return;
+            for (int i = 0; i < amount; i++)
+            {
+                if (r == null || Playing == Values.Players.Opponent)
+                    return;
 
-            int index = r.Next(deck.Count);
-            Card card = deck[index];
+                int index = r.Next(deck.Count);
+                Card card = deck[index];
 
-            if (deck.Count == 0)
-                NewDeck();
-            deck.RemoveAt(index);
+                if (deck.Count == 0)
+                    NewDeck();
+                deck.RemoveAt(index);
 
-            cards.Add(card);
+                cards.Add(card);
 
-            Playing = Values.Players.Opponent;
+                Playing = Values.Players.Opponent;
+            }
             VisualizePlayerCards();
         }
 
-        public void DrawCardForEnemy()
+        public void DrawCardForEnemy(int amount = 1)
         {
             if (r == null || Playing == Values.Players.Player)
                 return;
 
-            int index = r.Next(deck.Count);
+            for (int i = 0; i < amount; i++)
+            {
+                int index = r.Next(deck.Count);
 
-            if (deck.Count == 0)
-                NewDeck();
-            deck.RemoveAt(index);
-            enemyCardCount++;
+                if (deck.Count == 0)
+                    NewDeck();
+                deck.RemoveAt(index);
+                enemyCardCount++;
 
-            Playing = Values.Players.Player;
+                Playing = Values.Players.Player;
+            }
             VisualizeOpponentCards();
         }
 
         public async void PlayCard(Card card)
         {
-            //bugged
             if (Playing == Values.Players.Opponent) return;
             if (!card.CanBePlayed(LastPlayed)) return;
 
@@ -234,20 +255,26 @@ namespace Prsi
             }
             else ChangeTo = null;
 
+            cards.Remove(card);
+            thrownOut.Add(card);
+            LastPlayed = card;
+            Playing = Values.Players.Opponent;
+
+            if (card.Number == 7)
+                StackedCards += 2;
+
             using NpgsqlCommand cmd = new("select tahni(@jmenoin, @hesloin, @tahin)", Values.Connection);
             cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
             cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
             cmd.Parameters.AddWithValue("@tahin", card.Name + ChangeTo);
             await cmd.ExecuteNonQueryAsync();
 
-            cards.Remove(card);
-            thrownOut.Add(card);
-            LastPlayed = card;
-            Playing = Values.Players.Opponent;
+            ChangeTo = null;
+
             VisualizePlayerCards();
         }
 
-        public void RemoveCardFromDeck(string name)
+        public void RemoveCardFromDeck(string name, char? colorCode)
         {
             if (Playing == Values.Players.Player) return;
 
@@ -263,7 +290,7 @@ namespace Prsi
             enemyCardCount--;
 
             Playing = Values.Players.Player;
-            VisualizeOpponentCards();
+            VisualizeOpponentCards(colorCode);
         }
 
         private void NewDeck() => deck = thrownOut.GetRange(0, thrownOut.Count);
@@ -275,7 +302,11 @@ namespace Prsi
             cards.Clear();
         }
 
-        public void SetPlaying() => Playing = Values.Players.Player;
+        public void SetPlaying() 
+        { 
+            Playing = Values.Players.Player;
+            ChangeColorPlaying();
+        }
 
         public async Task QuitGame(Values.Players winner)
         {
@@ -294,13 +325,24 @@ namespace Prsi
         {
             if (Playing == Values.Players.Opponent) return;
 
-            using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, '_')", Values.Connection);
-            cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-            cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            await cmd.ExecuteNonQueryAsync(Values.FormClosedToken);
+            int num = 0;
 
             if (LastPlayed?.Name.Contains("14") == false)
                 DrawCard();
+
+            else if (LastPlayed?.Number == 7)
+            {
+                num = StackedCards;
+                DrawCard(StackedCards);
+                StackedCards = 0;
+            }
+
+            Listener.CannotPlay = true;
+
+            using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, '_{num}')", Values.Connection);
+            cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+            cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+            await cmd.ExecuteNonQueryAsync(Values.FormClosedToken);
         }
 
         public void EnlargeCardsGrid()

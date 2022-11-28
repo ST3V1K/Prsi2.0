@@ -9,6 +9,8 @@ namespace Prsi
 {
     static class Listener
     {
+        public static bool CannotPlay { get; set; }
+
         public static async Task HandleListen(object o, NpgsqlNotificationEventArgs e)
         {
             string payload = e.Payload;
@@ -26,20 +28,40 @@ namespace Prsi
             if ((new char[] { 's', 'z', 'l', 'k' }).Contains(payload.First()))
             {
                 string cardName = payload;
-                if (payload.Contains("12"))
-                    cardName = payload[..^1];
-                if (Values.Game.LastPlayed?.Name != cardName)
+                char? colorCode = null;
+
+                if (payload is [_, '1', '2', _])
                 {
-                    Values.Game.RemoveCardFromDeck(cardName);
+                    cardName = payload[..^1];
+                    colorCode = payload.LastOrDefault();
                 }
+
+                if (payload is [_, '7'])
+                    Values.Game.StackedCards += 2;
+
+                if (Values.Game.LastPlayed?.Name != cardName)
+                    Values.Game.RemoveCardFromDeck(cardName, colorCode);
             }
 
-            if (payload == "_")
+            if (payload is ['_', ..])
             {
-                if (Values.Game.LastPlayed?.Name.Contains("14") == true)
-                    Values.Game.SetPlaying();
-                else
-                    Values.Game.DrawCardForEnemy();
+                if (CannotPlay)
+                {
+                    CannotPlay = false;
+                    return; 
+                }
+
+                int amount = int.Parse(payload[1..]);
+
+                if (amount == 0)
+                    Values.Game.StackedCards = 0;
+
+                if (Values.Game.LastPlayed?.Number != 14)
+                    Values.Game.DrawCardForEnemy(amount == 0 ? 1 : amount);
+
+                Values.Game.SetPlaying();
+
+                CannotPlay = false;
             }
 
             if (payload == "konec" && Values.Game.Winner == null) 
