@@ -11,19 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="S.svg" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="icon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Npgsql" Version="7.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="S.svg" />
   </ItemGroup>
 
   <ItemGroup>
