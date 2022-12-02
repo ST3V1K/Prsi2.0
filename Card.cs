@@ -32,6 +32,7 @@ namespace Prsi
                 (lastPlayed.ColorCode == ColorCode && lastPlayed.ChangeToColor == null && (lastPlayed.Number != 14 || lastPlayed.Number != 7)) ||
                 (lastPlayed.Number == Number && lastPlayed.ChangeToColor == null) ||
                 (Number == 12 && (lastPlayed.Number != 14 || lastPlayed.Number != 7)) ||
+                (lastPlayed.Number == 12 && (lastPlayed.ChangeToColor == ColorCode)) ||
                 (lastPlayed.ChangeToColor == ColorCode && (lastPlayed.Number != 14 || lastPlayed.Number != 7));
         }
     }

@@ -11,10 +11,10 @@ namespace Prsi
     {
         public static bool CannotPlay { get; set; }
 
-        public static async Task HandleListen(object o, NpgsqlNotificationEventArgs e)
+        public static void HandleListen(object o, NpgsqlNotificationEventArgs e)
         {
             string payload = e.Payload;
-            if (payload.StartsWith("p"))
+            if (payload is ['p', ..])
             {
                 string[] info = payload.Split('$');
 
@@ -25,7 +25,7 @@ namespace Prsi
                 Switcher.Switch(Values.Game);
             }
 
-            if ((new char[] { 's', 'z', 'l', 'k' }).Contains(payload.First()))
+            if (payload is ['s' or 'z' or 'l' or 'k', ..])
             {
                 string cardName = payload;
                 char? colorCode = null;
@@ -66,10 +66,7 @@ namespace Prsi
 
             if (payload == "konec" && Values.Game.Winner == null) 
             {
-                if (Values.Game.CardsCount == 0)
-                    await Values.Game.QuitGame(Values.Players.Player);
-                else
-                    await Values.Game.QuitGame(Values.Players.Opponent);
+                Values.Game.Lose();
             } 
         }
     }

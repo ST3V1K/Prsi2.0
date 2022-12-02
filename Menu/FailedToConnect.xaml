@@ -13,7 +13,7 @@
         <LineBreak />
         Zkontrolujte připojení k internetu.
       </TextBlock>
-      <Button HorizontalAlignment="Center" FontSize="20" Margin="5,5,5,5" Padding="3,3,3,3" Click="Button_Click">
+      <Button HorizontalAlignment="Center" FontSize="20" Margin="5,5,5,5" Padding="3,3,3,3" Click="Button_Click" Width="Auto">
         Zkusit znovu
       </Button>
     </StackPanel>

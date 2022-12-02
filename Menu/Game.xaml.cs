@@ -44,6 +44,8 @@ namespace Prsi
 
         private Values.Players? Playing = null;
 
+        private string? opponentName;
+
         public int StackedCards { get; set; }
 
         public Game()
@@ -54,15 +56,13 @@ namespace Prsi
         private async void BtnQuit_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Opravdu chcete opustit hru a tím se vzdát?", "Konec?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            {
-                await QuitGame(Values.Players.Opponent);
-                return;
-            }
+                await Surrender();
         }
 
         public void StartGame(int seed, string opponentName, bool host)
         {
             r = new(seed);
+            this.opponentName = opponentName;
             Dispatcher.Invoke(() => txtNames.Text = $"{Values.PlayerName}\n×\n{opponentName}");
 
             ClearData();
@@ -270,8 +270,21 @@ namespace Prsi
             await cmd.ExecuteNonQueryAsync();
 
             ChangeTo = null;
+            Dispatcher.Invoke(() => Values.Game.changeColorImage.Source = null);
 
             VisualizePlayerCards();
+
+            if (cards.Count == 0)
+            {
+                using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'X')", Values.Connection);
+                cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+                cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+                await cmdKonec.ExecuteNonQueryAsync();
+
+                Win();
+
+                return;
+            }
         }
 
         public void RemoveCardFromDeck(string name, char? colorCode)
@@ -280,13 +293,14 @@ namespace Prsi
 
             if (deck.Count == 0)
                 NewDeck();
-            
-            Card? card = Values.Cards.Where(c =>  c.Name == name).FirstOrDefault();
+
+            Card? card = Values.Cards.Where(c => c.Name == name).FirstOrDefault();
 
             if (card == null) return;
-            
+
             thrownOut.Add(card);
             LastPlayed = card;
+            LastPlayed.ChangeToColor = colorCode;
             enemyCardCount--;
 
             Playing = Values.Players.Player;
@@ -302,20 +316,23 @@ namespace Prsi
             cards.Clear();
         }
 
-        public void SetPlaying() 
-        { 
+        public void SetPlaying()
+        {
             Playing = Values.Players.Player;
             ChangeColorPlaying();
         }
 
-        public async Task QuitGame(Values.Players winner)
+        private async Task Surrender()
         {
-            Winner = winner;
             using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, 'X')", Values.Connection);
             cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
             cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
             cmd.Parameters.AddWithValue("@tahin", "X");
             await cmd.ExecuteNonQueryAsync(Values.FormClosedToken);
+        }
+
+        private void QuitGame()
+        {
             ClearData();
             deck.Clear();
             Switcher.Switch(Values.GetMainMenu());
@@ -353,6 +370,21 @@ namespace Prsi
         public void ShrinkCardsGrid()
         {
             cardsGrid.Height = 120;
+        }
+
+        public void Win()
+        {
+            Winner = Values.Players.Player;
+            MessageBox.Show($"Vyhrál {Values.PlayerName}");
+            QuitGame();
+        }
+
+        public void Lose()
+        {
+            VisualizeOpponentCards();
+            Winner = Values.Players.Opponent;
+            MessageBox.Show($"Vyhrál {Values.Game.opponentName}");
+            QuitGame();
         }
     }
 }

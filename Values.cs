@@ -22,6 +22,7 @@ namespace Prsi
 
         public static string PlayerName
         {
+
             get
             {
                 if (playerName != null)

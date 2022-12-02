@@ -40,7 +40,9 @@ namespace Prsi
 
         private async void MakeUserActive(object? sender, EventArgs e)
         {
-            await using NpgsqlCommand cmd = new("select zaktivovat(@jmenoin, @hesloin)", Values.Connection);
+            var conn = Values.Connection?.CloneWith(Values.CONNECTION_STRING);
+
+            await using NpgsqlCommand cmd = new("select zaktivovat(@jmenoin, @hesloin)", conn);
             cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
             cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
             await cmd.ExecuteNonQueryAsync();
