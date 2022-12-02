@@ -355,6 +355,7 @@ namespace Prsi
             }
 
             Listener.CannotPlay = true;
+            ChangeColorPlaying();
 
             using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, '_{num}')", Values.Connection);
             cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
