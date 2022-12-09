@@ -7,8 +7,12 @@
     <UseWPF>true</UseWPF>
     <NeutralLanguage>cs-CZ</NeutralLanguage>
     <PackageIcon>icon.png</PackageIcon>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>prsi.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="prsi.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="7.0.0" />
