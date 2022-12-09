@@ -42,11 +42,14 @@ namespace Prsi
         {
             var conn = Values.Connection?.CloneWith(Values.CONNECTION_STRING);
 
+            if (conn == null) return;
+
             await using NpgsqlCommand cmd = new("select zaktivovat(@jmenoin, @hesloin)", conn);
             cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
             cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+            await conn.OpenAsync();
             await cmd.ExecuteNonQueryAsync();
-            await cmd.DisposeAsync();
+            await conn.CloseAsync();
         }
 
         private async void Prsi_Closing(object sender, System.ComponentModel.CancelEventArgs e)

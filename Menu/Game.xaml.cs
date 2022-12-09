@@ -218,9 +218,8 @@ namespace Prsi
                 deck.RemoveAt(index);
 
                 cards.Add(card);
-
-                Playing = Values.Players.Opponent;
             }
+            Playing = Values.Players.Opponent;
             VisualizePlayerCards();
         }
 
@@ -344,15 +343,15 @@ namespace Prsi
 
             int num = 0;
 
-            if (LastPlayed?.Name.Contains("14") == false)
-                DrawCard();
-
-            else if (LastPlayed?.Number == 7)
+            if (LastPlayed?.Number == 7)
             {
                 num = StackedCards;
                 DrawCard(StackedCards);
                 StackedCards = 0;
             }
+
+            else if (LastPlayed?.Number != 14)
+                DrawCard();
 
             Listener.CannotPlay = true;
             ChangeColorPlaying();
