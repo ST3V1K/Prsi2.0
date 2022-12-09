@@ -58,7 +58,9 @@ namespace Prsi
                 Selected = true;
                 double offX = Values.MOVE_LENGTH * Math.Sin(Angle * (Math.PI / 180));
                 double offY = -Values.MOVE_LENGTH * Math.Cos(Angle * (Math.PI / 180));
-                ((TransformGroup)RenderTransform).Children.Add(new TranslateTransform(offX, offY));
+
+                if (((TransformGroup)RenderTransform).Children.Count == 1)
+                    ((TransformGroup)RenderTransform).Children.Add(new TranslateTransform(offX, offY));
 
                 foreach (CardControl cc in Values.Game?.cardsGrid.Children.OfType<CardControl>().Where(c => c != this) ?? Array.Empty<CardControl>())
                 {
