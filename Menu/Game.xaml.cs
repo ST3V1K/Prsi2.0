@@ -68,7 +68,12 @@ namespace Prsi
             ClearData();
             deck = ((Card[])Values.Cards.Clone()).ToList();
 
-            LastPlayed = deck[r.Next(deck.Count)];
+            Card firstCard;
+            while ((firstCard = deck[r.Next(deck.Count)]).Number == 12) ;
+
+            if (firstCard.Number == 7) StackedCards += 2;
+
+            LastPlayed = firstCard;
             deck.Remove(LastPlayed);
             thrownOut.Add(LastPlayed);
 
@@ -313,6 +318,7 @@ namespace Prsi
             Playing = null;
             thrownOut.Clear();
             cards.Clear();
+            StackedCards = 0;
         }
 
         public void SetPlaying()
@@ -349,8 +355,9 @@ namespace Prsi
                 DrawCard(StackedCards);
                 StackedCards = 0;
             }
-
-            else if (LastPlayed?.Number != 14)
+            if (LastPlayed?.Number == 14)
+                Playing = Values.Players.Opponent;
+            else
                 DrawCard();
 
             Listener.CannotPlay = true;

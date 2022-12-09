@@ -51,7 +51,10 @@ namespace Prsi
                     return; 
                 }
 
+                if (Values.Game.LastPlayed == null) return;
+
                 int amount = int.Parse(payload[1..]);
+                Values.Game.LastPlayed.CanPlay = true;
 
                 if (amount == 0)
                     Values.Game.StackedCards = 0;
