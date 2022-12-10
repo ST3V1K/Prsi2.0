@@ -31,9 +31,9 @@ namespace Prsi
         {
             if (lastPlayed == null) return false;
 
-            bool color = lastPlayed.ColorCode == ColorCode && lastPlayed.ChangeToColor == null && (lastPlayed.Number != 14 && lastPlayed.Number != 7 || CanPlay);
+            bool color = lastPlayed.ColorCode == ColorCode && lastPlayed.ChangeToColor == null && (lastPlayed.Number != 14 && lastPlayed.Number != 7 || lastPlayed.CanPlay);
             bool number = lastPlayed.Number == Number && lastPlayed.ChangeToColor == null;
-            bool changeColor = Number == 12 && (lastPlayed.Number != 14 && lastPlayed.Number != 7 || CanPlay);
+            bool changeColor = Number == 12 && (lastPlayed.Number != 14 && lastPlayed.Number != 7 || lastPlayed.CanPlay);
             bool wasChanged = lastPlayed.Number == 12 && (lastPlayed.ChangeToColor == ColorCode);
 
             return color || number || changeColor || wasChanged;

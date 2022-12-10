@@ -29,6 +29,8 @@ namespace Prsi
         {
             Image img = (Image)sender;
             Values.Game.ChangeTo = ((string)img.Tag).FirstOrDefault();
+            if (Values.Game.LastPlayed != null)
+                Values.Game.LastPlayed.ChangeToColor = ((string)img.Tag).FirstOrDefault();
             Close();
         }
     }

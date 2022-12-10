@@ -27,23 +27,25 @@ namespace Prsi
 
             if (payload is ['s' or 'z' or 'l' or 'k', ..])
             {
-                string cardName = payload;
-                char? colorCode = null;
+                if (Values.Game.LastPlayed == null) return;
 
-                if (payload is [_, '1', '2', _])
+                string cardName = payload;
+                Values.Game.LastPlayed.ChangeToColor = null;
+
+                if (payload is [_, '1', '2', char color])
                 {
                     cardName = payload[..^1];
-                    colorCode = payload.LastOrDefault();
+                    Values.Game.LastPlayed.ChangeToColor = color;
                 }
 
                 if (payload is [_, '7'])
                     Values.Game.StackedCards += 2;
 
                 if (Values.Game.LastPlayed?.Name != cardName)
-                    Values.Game.RemoveCardFromDeck(cardName, colorCode);
+                    Values.Game.RemoveCardFromDeck(cardName);
             }
 
-            if (payload is ['_', ..])
+            if (payload is ['_', .. string num])
             {
                 if (CannotPlay)
                 {
@@ -53,11 +55,10 @@ namespace Prsi
 
                 if (Values.Game.LastPlayed == null) return;
 
-                int amount = int.Parse(payload[1..]);
-                Values.Game.LastPlayed.CanPlay = true;
+                int amount = int.Parse(num);
 
-                if (amount == 0)
-                    Values.Game.StackedCards = 0;
+                Values.Game.LastPlayed.CanPlay = true;
+                Values.Game.StackedCards = 0;
 
                 if (Values.Game.LastPlayed?.Number != 14)
                     Values.Game.DrawCardForEnemy(amount == 0 ? 1 : amount);
