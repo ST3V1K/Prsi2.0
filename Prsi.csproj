@@ -8,6 +8,8 @@
     <NeutralLanguage>cs-CZ</NeutralLanguage>
     <PackageIcon>icon.png</PackageIcon>
     <ApplicationIcon>prsi.ico</ApplicationIcon>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
