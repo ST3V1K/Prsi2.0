@@ -380,7 +380,7 @@ namespace Prsi
             ChangeColorPlaying();
 
             if (deck.Count == 0) 
-                NewDeck();
+                await NewDeck();
             else {
                 using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, '_{num}')", Values.Connection);
                 cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
