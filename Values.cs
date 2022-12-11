@@ -7,7 +7,7 @@ namespace Prsi
     {
         public enum Players
         {
-            Player, Opponent
+            Player, Opponent, None
         }
 
         internal const string CONNECTION_STRING = "User Id = hrac; Password = heslo; Server = db.udfszyxwuvjzxhptzout.supabase.co; Port = 5432; Database = postgres";

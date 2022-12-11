@@ -68,10 +68,18 @@ namespace Prsi
                 CannotPlay = false;
             }
 
-            if (payload == "konec" && Values.Game.Winner == null) 
+            if (payload == "konec") 
             {
-                Values.Game.Lose();
-            } 
+                if (Values.Game.EnemyCardCount == 0 || Values.Game.Winner == Values.Players.Opponent)
+                    Values.Game.Lose();
+                else
+                    Values.Game.Win();
+            }
+
+            if (payload == "remiza")
+            {
+                Values.Game.Draw();
+            }
         }
     }
 }
