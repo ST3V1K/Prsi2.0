@@ -321,14 +321,7 @@ namespace Prsi
             deck.AddRange(thrownOut.Where(c => c != LastPlayed));
             thrownOut.Clear();
 
-            if (deck.Count == 0)
-            {
-                Listener.Tie = true;
-                using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'T')", Values.Connection);
-                cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-                cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-                await cmdKonec.ExecuteNonQueryAsync();
-            }
+            if (deck.Count == 0) await RequestTie();
         }
 
         private void ClearData()
@@ -393,22 +386,23 @@ namespace Prsi
             Listener.CannotPlay = true;
             ChangeColorPlaying();
 
-            if (deckCount == 0)
-            {
-                Listener.Tie = true;
-                using NpgsqlCommand cmd = new("select tahni(@jmenoin, @hesloin, 'T')", Values.Connection);
-                cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-                cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-                await cmd.ExecuteNonQueryAsync();
-            }
-            else
+            if (deck.Count > 0)
             {
                 using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, '_{num}')", Values.Connection);
                 cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
                 cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
                 await cmd.ExecuteNonQueryAsync(Values.FormClosedToken);
             }
+            else await RequestTie();
+        }
 
+        private async Task RequestTie()
+        {
+            Listener.Tie = true;
+            using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'T')", Values.Connection);
+            cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+            cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+            await cmdKonec.ExecuteNonQueryAsync();
         }
 
         public void EnlargeCardsGrid()
