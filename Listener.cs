@@ -55,16 +55,15 @@ namespace Prsi
                     return; 
                 }
 
-                if (Values.Game.LastPlayed == null) return;
-
                 int amount = int.Parse(num);
+
+                if (Values.Game.LastPlayed?.Number != 14 || Values.Game.LastPlayed?.CanPlay == true) 
+                    Values.Game.DrawCardForEnemy(amount == 0 ? 1 : amount);
+
+                if (Values.Game.LastPlayed == null) return;
 
                 Values.Game.LastPlayed.CanPlay = true;
                 Values.Game.StackedCards = 0;
-
-                if (Values.Game.LastPlayed?.Number != 14)
-                    Values.Game.DrawCardForEnemy(amount == 0 ? 1 : amount);
-
                 Values.Game.SetPlaying();
 
                 CannotPlay = false;

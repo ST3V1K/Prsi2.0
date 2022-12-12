@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -215,11 +216,11 @@ namespace Prsi
 
         public async void DrawCard(int amount = 1)
         {
+            if (r == null || Playing == Values.Players.Opponent)
+                return;
+
             for (int i = 0; i < amount; i++)
             {
-                if (r == null || Playing == Values.Players.Opponent)
-                    return;
-
                 if (deck.Count == 0)
                     await NewDeck();
 
@@ -373,9 +374,11 @@ namespace Prsi
             }
 
             int num = 0;
+            int deckCount = -1;
 
             if (LastPlayed?.Number == 7)
             {
+                deckCount = deck.Count;
                 num = StackedCards;
                 DrawCard(StackedCards == 0 ? 1 : StackedCards);
                 StackedCards = 0;
@@ -385,10 +388,12 @@ namespace Prsi
             else
                 DrawCard();
 
+            if (LastPlayed != null)
+                LastPlayed.CanPlay = true;
             Listener.CannotPlay = true;
             ChangeColorPlaying();
 
-            if (deck.Count == 0)
+            if (deckCount == 0)
             {
                 Listener.Tie = true;
                 using NpgsqlCommand cmd = new("select tahni(@jmenoin, @hesloin, 'T')", Values.Connection);
