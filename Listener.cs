@@ -1,4 +1,5 @@
 using Npgsql;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace Prsi
     static class Listener
     {
         public static bool CannotPlay { get; set; }
+        public static bool Tie { get; set; }
 
         public static void HandleListen(object o, NpgsqlNotificationEventArgs e)
         {
@@ -78,7 +80,19 @@ namespace Prsi
 
             if (payload == "remiza")
             {
-                Values.Game.Draw();
+                if (Tie)
+                {
+                    Tie = false;
+                    return;
+                }
+
+                if (Values.Game.CanPlaySomeCard)
+                {
+                    Values.Game.MustPlay = true;
+                    Values.Game.SetPlaying();
+                }
+                else
+                    Values.Game.Draw();
             }
         }
     }

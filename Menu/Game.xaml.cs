@@ -48,6 +48,10 @@ namespace Prsi
 
         public int StackedCards { get; set; }
 
+        public bool CanPlaySomeCard { get => cards.Any(c => c.CanBePlayed(LastPlayed)); }
+        
+        public bool MustPlay { get; set; }
+
         public Game()
         {
             InitializeComponent();
@@ -279,6 +283,7 @@ namespace Prsi
             cmd.Parameters.AddWithValue("@tahin", card.Name + ChangeTo);
             await cmd.ExecuteNonQueryAsync();
 
+            MustPlay = false;
             VisualizePlayerCards();
 
             if (cards.Count == 0)
@@ -292,12 +297,9 @@ namespace Prsi
             }
         }
 
-        public async void RemoveCardFromDeck(string name)
+        public void RemoveCardFromDeck(string name)
         {
             if (Playing == Values.Players.Player) return;
-
-            if (deck.Count == 0)
-                await NewDeck();
 
             Card card = Values.Cards.Where(c => c.Name == name).First();
 
@@ -320,6 +322,7 @@ namespace Prsi
 
             if (deck.Count == 0)
             {
+                Listener.Tie = true;
                 using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'T')", Values.Connection);
                 cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
                 cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
@@ -363,6 +366,12 @@ namespace Prsi
         {
             if (Playing == Values.Players.Opponent) return;
 
+            if (MustPlay)
+            {
+                MessageBox.Show("Musíte odehrát");
+                return;
+            }
+
             int num = 0;
 
             if (LastPlayed?.Number == 7)
@@ -379,9 +388,16 @@ namespace Prsi
             Listener.CannotPlay = true;
             ChangeColorPlaying();
 
-            if (deck.Count == 0) 
-                await NewDeck();
-            else {
+            if (deck.Count == 0)
+            {
+                Listener.Tie = true;
+                using NpgsqlCommand cmd = new("select tahni(@jmenoin, @hesloin, 'T')", Values.Connection);
+                cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+                cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+                await cmd.ExecuteNonQueryAsync();
+            }
+            else
+            {
                 using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, '_{num}')", Values.Connection);
                 cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
                 cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
