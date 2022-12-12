@@ -53,6 +53,8 @@ namespace Prsi
         
         public bool MustPlay { get; set; }
 
+        public bool IsRunning { get; private set; }
+
         public Game()
         {
             InitializeComponent();
@@ -102,6 +104,8 @@ namespace Prsi
             VisualizeDeck();
             VisualizePlayerCards();
             VisualizeOpponentCards();
+
+            IsRunning = true;
         }
 
         private void ChangeColorPlaying()
@@ -380,7 +384,7 @@ namespace Prsi
             ChangeColorPlaying();
         }
 
-        private async Task Surrender()
+        public async Task Surrender()
         {
             Winner = Values.Players.Opponent;
 
@@ -392,6 +396,8 @@ namespace Prsi
 
         private void QuitGame()
         {
+            IsRunning = false;
+
             ClearData();
             deck.Clear();
             Switcher.Switch(Values.GetMainMenu());

@@ -55,8 +55,31 @@ namespace Prsi
         private async void Prsi_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Values.IsFormClosed = true;
-            if (Values.Connection?.State == ConnectionState.Open)
-                await Values.Connection.CloseAsync();
+
+            if (Values.Game.IsRunning)
+                await Values.Game.Surrender();
+
+            try
+            {
+                using var cmdLogOut = new NpgsqlCommand("select odhlasit(@jmenoin, @hesloin)", Values.Connection);
+                cmdLogOut.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+                cmdLogOut.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+                cmdLogOut.ExecuteNonQuery();
+            }
+            catch (NoNameException) { }
+
+            try
+            {
+                if (Values.Connection != null)
+                    await Values.Connection.CloseAsync();
+            }
+            catch (NpgsqlOperationInProgressException) { }
+            try
+            {
+                if (Values.Connection_Listen != null)
+                    await Values.Connection_Listen.CloseAsync();
+            }
+            catch (NpgsqlOperationInProgressException) { }
         }
     }
 }
