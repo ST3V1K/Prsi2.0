@@ -49,6 +49,7 @@ namespace Prsi
 
             if (payload is ['_', .. string num])
             {
+                ;
                 if (CannotPlay)
                 {
                     CannotPlay = false;
@@ -79,14 +80,12 @@ namespace Prsi
 
             if (payload == "remiza")
             {
-                if (Tie)
-                {
-                    Tie = false;
-                    return;
-                }
+                if (Tie) return;
+                Tie = false;
 
                 if (Values.Game.CanPlaySomeCard)
                 {
+                    Values.Game.RemoveDeck();
                     Values.Game.MustPlay = true;
                     Values.Game.SetPlaying();
                 }

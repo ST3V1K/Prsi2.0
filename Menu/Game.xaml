@@ -21,5 +21,6 @@
       <Button Name="BtnCannotPlay"  Width="Auto" Click="BtnCannotPlay_Click">Nemohu hrát</Button>
     </StackPanel>
     <Ellipse x:Name="ellipse" Margin="5" Width="15" Height="15" Fill="White" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+    <Grid x:Name="deckGrid" HorizontalAlignment="Left" VerticalAlignment="Center" Height="192" Width="152" Margin="0,0,0,16"/>
   </Grid>
 </UserControl>

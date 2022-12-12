@@ -99,6 +99,7 @@ namespace Prsi
             if (host) Playing = Values.Players.Player;
             else Playing = Values.Players.Opponent;
 
+            VisualizeDeck();
             VisualizePlayerCards();
             VisualizeOpponentCards();
         }
@@ -196,6 +197,38 @@ namespace Prsi
             });
         }
 
+        public void VisualizeDeck()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                deckGrid.Children.Clear();
+
+                for (int i = 0; i < deck.Count; i++)
+                {
+                    Image img = new()
+                    {
+                        Source = Values.CardBack.BitmapImage,
+                        Width = 120,
+                        Height = 160,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        VerticalAlignment = VerticalAlignment.Bottom,
+                        Margin = new(0, 0, i, i)
+                    };
+
+                    deckGrid.Children.Add(img);
+                }
+                deckGrid.Children.Add(new TextBlock()
+                {
+                    Text = deck.Count.ToString(),
+                    TextAlignment = TextAlignment.Center,
+                    FontWeight = FontWeights.Bold,
+                    FontSize = 20,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                });
+            });
+        }
+
         private void GiveCard()
         {
             if (r == null) return;
@@ -231,6 +264,7 @@ namespace Prsi
                 cards.Add(card);
             }
             Playing = Values.Players.Opponent;
+            VisualizeDeck();
             VisualizePlayerCards();
         }
 
@@ -249,6 +283,7 @@ namespace Prsi
                 EnemyCardCount++;
             }
             Playing = Values.Players.Player;
+            VisualizeDeck();
             VisualizeOpponentCards();
         }
 
@@ -293,8 +328,6 @@ namespace Prsi
                 cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
                 cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
                 await cmdKonec.ExecuteNonQueryAsync();
-
-                Win();
             }
         }
 
@@ -302,7 +335,8 @@ namespace Prsi
         {
             if (Playing == Values.Players.Player) return;
 
-            Card card = Values.Cards.Where(c => c.Name == name).First();
+            Card? card = Values.Cards.Where(c => c.Name == name).FirstOrDefault();
+            if (card == null) return;
 
             char? changeTo = LastPlayed?.ChangeToColor;
 
@@ -313,7 +347,14 @@ namespace Prsi
             LastPlayed.ChangeToColor = changeTo;
 
             Playing = Values.Players.Player;
+
             VisualizeOpponentCards();
+        }
+
+        public void RemoveDeck()
+        {
+            deck.Clear();
+            VisualizeDeck();
         }
 
         private async Task NewDeck() 
@@ -367,17 +408,19 @@ namespace Prsi
             }
 
             int num = 0;
-            int deckCount = -1;
+            bool noTie = false;
 
             if (LastPlayed?.Number == 7)
             {
-                deckCount = deck.Count;
                 num = StackedCards;
                 DrawCard(StackedCards == 0 ? 1 : StackedCards);
                 StackedCards = 0;
             }
             else if (LastPlayed?.Number == 14 && LastPlayed?.CanPlay != true)
+            {
+                noTie = true;
                 Playing = Values.Players.Opponent;
+            }
             else
                 DrawCard();
 
@@ -386,7 +429,7 @@ namespace Prsi
             Listener.CannotPlay = true;
             ChangeColorPlaying();
 
-            if (deck.Count > 0)
+            if (deck.Count > 0 || noTie)
             {
                 using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, '_{num}')", Values.Connection);
                 cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
@@ -396,7 +439,7 @@ namespace Prsi
             else await RequestTie();
         }
 
-        private async Task RequestTie()
+        private static async Task RequestTie()
         {
             Listener.Tie = true;
             using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'T')", Values.Connection);
