@@ -376,6 +376,7 @@ namespace Prsi
             cards.Clear();
             EnemyCardCount = 0;
             StackedCards = 0;
+            MustPlay = false;
         }
 
         public void SetPlaying()
@@ -391,7 +392,7 @@ namespace Prsi
             using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, 'X')", Values.Connection);
             cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
             cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            await cmd.ExecuteNonQueryAsync(Values.FormClosedToken);
+            await cmd.ExecuteNonQueryAsync(Values.FormClosedToken).ContinueWith((t) => { });
         }
 
         private void QuitGame()
