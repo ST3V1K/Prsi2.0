@@ -9,7 +9,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <ApplicationIcon>prsi.ico</ApplicationIcon>
     <AssemblyVersion>1.1.1</AssemblyVersion>
-    <FileVersion>1.1.0</FileVersion>
+    <FileVersion>1.1.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
