@@ -10,7 +10,7 @@ namespace Prsi
             Player, Opponent, None
         }
 
-        internal const string CONNECTION_STRING = "User Id = hrac; Password = heslo; Server = db.udfszyxwuvjzxhptzout.supabase.co; Port = 5432; Database = postgres";
+        internal const string CONNECTION_STRING = "User Id=hrac; Password=heslo; Server=db.udfszyxwuvjzxhptzout.supabase.co; Port=5432; Database=postgres; SSL Mode=Require; Trust Server Certificate=true";
         private static string? playerName;
         private static string? playerPassword;
 
