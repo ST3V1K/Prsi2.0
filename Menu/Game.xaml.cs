@@ -1,24 +1,12 @@
 ﻿using Npgsql;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
-using System.Security.AccessControl;
-using System.Text;
+using System.Media;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Prsi
 {
@@ -98,7 +86,7 @@ namespace Prsi
                 }
             }
 
-            if (host) Playing = Values.Players.Player;
+            if (host) SetPlaying();
             else Playing = Values.Players.Opponent;
 
             VisualizeDeck();
@@ -286,7 +274,7 @@ namespace Prsi
                 deck.RemoveAt(index);
                 EnemyCardCount++;
             }
-            Playing = Values.Players.Player;
+            SetPlaying();
             VisualizeDeck();
             VisualizeOpponentCards();
         }
@@ -349,8 +337,7 @@ namespace Prsi
             thrownOut.Add(card);
             LastPlayed = card;
             LastPlayed.ChangeToColor = changeTo;
-
-            Playing = Values.Players.Player;
+            SetPlaying();
 
             VisualizeOpponentCards();
         }
@@ -383,6 +370,8 @@ namespace Prsi
         {
             Playing = Values.Players.Player;
             ChangeColorPlaying();
+            using SoundPlayer sound = new(Properties.Resources.beep);
+            sound.Play();
         }
 
         public async Task Surrender()
