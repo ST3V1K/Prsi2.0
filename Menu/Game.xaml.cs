@@ -110,14 +110,14 @@ namespace Prsi
             });
         }
 
-        private void VisualizeLastPlayedCard(char? centerCardColorCode)
+        private void VisualizeLastPlayedCard()
         {
             if (LastPlayed == null) return;
 
             lastPlayedImage.Source = LastPlayed.BitmapImage;
             if (LastPlayed.Number == 12)
             {
-                changeColorImage.Source = centerCardColorCode switch
+                changeColorImage.Source = ChangeTo switch
                 {
                     's' => (DrawingImage)FindResource("ImageS"),
                     'k' => (DrawingImage)FindResource("ImageK"),
@@ -136,7 +136,7 @@ namespace Prsi
                 if (LastPlayed == null) return;
 
                 cardsGrid.Children.Clear();
-                VisualizeLastPlayedCard(ChangeTo);
+                VisualizeLastPlayedCard();
                 ChangeColorPlaying();
 
                 for (int i = 0; i < cards.Count; i++)
@@ -168,7 +168,7 @@ namespace Prsi
                 if (LastPlayed == null) return;
 
                 opponentGrid.Children.Clear();
-                VisualizeLastPlayedCard(LastPlayed.ChangeToColor);
+                VisualizeLastPlayedCard();
                 ChangeColorPlaying();
 
                 for (int i = 0; i < EnemyCardCount; i++)
@@ -284,26 +284,30 @@ namespace Prsi
             if (Playing == Values.Players.Opponent) return;
             if (!card.CanBePlayed(LastPlayed)) return;
 
-            if (card.Number == 12)
-            {
-                ChangeColor changeColor = new() { Owner = Switcher.PageSwitcher };
-                changeColor.ShowDialog();
-            }
-            else
-            {
-                ChangeTo = null; 
-                Dispatcher.Invoke(() => Values.Game.changeColorImage.Source = null);
-            }
-
             var _card = Values.Cards.Where(c => c.Name == card.Name).First();
 
             cards.RemoveAll(c => c.Name == card.Name);
             thrownOut.Add(_card);
             LastPlayed = _card;
-            Playing = Values.Players.Opponent;
+
+            if (LastPlayed.Number == 12)
+            {
+                ChangeColor changeColor = new()
+                {
+                    Owner = Switcher.PageSwitcher
+                };
+                changeColor.ShowDialog();
+            }
+            else
+            {
+                ChangeTo = null;
+                Dispatcher.Invoke(() => Values.Game.changeColorImage.Source = null);
+            }
 
             if (card.Number == 7)
                 StackedCards += 2;
+
+            Playing = Values.Players.Opponent;
 
             using NpgsqlCommand cmd = new("select tahni(@jmenoin, @hesloin, @tahin)", Values.Connection);
             cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
@@ -330,13 +334,10 @@ namespace Prsi
             Card? card = Values.Cards.Where(c => c.Name == name).FirstOrDefault();
             if (card == null) return;
 
-            char? changeTo = LastPlayed?.ChangeToColor;
-
             EnemyCardCount--;
             deck.RemoveAll(c => c.Name == name);
             thrownOut.Add(card);
             LastPlayed = card;
-            LastPlayed.ChangeToColor = changeTo;
             SetPlaying();
 
             VisualizeOpponentCards();

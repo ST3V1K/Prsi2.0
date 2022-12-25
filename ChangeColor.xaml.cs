@@ -28,9 +28,8 @@ namespace Prsi
         private void Img_MouseUp(object sender, MouseButtonEventArgs e)
         {
             Image img = (Image)sender;
-            Values.Game.ChangeTo = ((string)img.Tag).FirstOrDefault();
-            if (Values.Game.LastPlayed != null)
-                Values.Game.LastPlayed.ChangeToColor = ((string)img.Tag).FirstOrDefault();
+            char? changeTo = ((string)img.Tag).FirstOrDefault();
+            Values.Game.ChangeTo = changeTo;
             Close();
         }
     }

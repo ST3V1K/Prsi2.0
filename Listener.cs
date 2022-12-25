@@ -33,12 +33,13 @@ namespace Prsi
 
 
                 string cardName = payload is [_, '1', '2', _] ? payload[..^1] : payload;
-                Values.Game.LastPlayed.ChangeToColor = null;
 
                 if (Values.Game.LastPlayed.Name == cardName) return;
 
                 if (payload is [_, '1', '2', char color])
-                    Values.Game.LastPlayed.ChangeToColor = color;
+                    Values.Game.ChangeTo = color;
+                else
+                    Values.Game.ChangeTo = null;
 
                 if (payload is [_, '7'])
                     Values.Game.StackedCards += 2;
