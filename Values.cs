@@ -1,5 +1,7 @@
-﻿using Npgsql;
+﻿using System;
 using System.Threading;
+using static Prsi.Server.GameService;
+using static Prsi.Server.PlayerService;
 
 namespace Prsi
 {
@@ -10,13 +12,33 @@ namespace Prsi
             Player, Opponent, None
         }
 
-        internal const string CONNECTION_STRING = "User Id=hrac; Password=heslo; Server=db.udfszyxwuvjzxhptzout.supabase.co; Port=5432; Database=postgres; SSL Mode=Require; Trust Server Certificate=true";
+        internal const string SERVER_ADDRESS = "http://10.0.0.3:5001";
         private static string? playerName;
         private static string? playerPassword;
 
-        public static NpgsqlConnection? Connection { get; set; }
+        private static GameServiceClient? gameClient;
+        private static PlayerServiceClient? playerClient;
 
-        public static NpgsqlConnection? Connection_Listen { get; set; }
+        internal static GameServiceClient GameClient
+        {
+            get
+            {
+                if (gameClient is not null)
+                    return gameClient;
+                throw new();
+            }
+            set => gameClient = value;
+        }
+        internal static PlayerServiceClient PlayerClient
+        {
+            get
+            {
+                if (playerClient is not null)
+                    return playerClient;
+                throw new();
+            }
+            set => playerClient = value;
+        }
 
         private static readonly Game game = new();
 

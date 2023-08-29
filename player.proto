@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "Prsi.Server";
+
+package server;
+
+import "game.proto";
+
+service PlayerService {
+  rpc Login(PlayerName) returns (PlayerPassword);
+  rpc Logout(Player) returns (SuccessResponse);
+}
+
+message PlayerName {
+  string name = 1;
+}
+
+message PlayerPassword {
+  string password = 1;
+}

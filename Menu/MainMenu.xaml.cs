@@ -1,5 +1,4 @@
-﻿using Npgsql;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -39,12 +38,12 @@ namespace Prsi
 
         private async void BtnJoinQueue_Click(object sender, RoutedEventArgs e)
         {
-            Switcher.Switch(new CreateGame());
-            using NpgsqlCommand cmd = new("select toggle_queue(@jmenoin, @hesloin, true, @seedin)", Values.Connection);
-            cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-            cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            cmd.Parameters.AddWithValue("@seedin", new Random().Next(int.MaxValue / 2));
-            await cmd.ExecuteNonQueryAsync();
+            //Switcher.Switch(new CreateGame());
+            //using NpgsqlCommand cmd = new("select toggle_queue(@jmenoin, @hesloin, true, @seedin)", Values.Connection);
+            //cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+            //cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+            //cmd.Parameters.AddWithValue("@seedin", new Random().Next(int.MaxValue / 2));
+            //await cmd.ExecuteNonQueryAsync();
         }
 
         private void BtnJoinGame_Click(object sender, RoutedEventArgs e)

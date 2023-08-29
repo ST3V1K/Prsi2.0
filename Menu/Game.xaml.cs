@@ -1,5 +1,4 @@
-﻿using Npgsql;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Media;
@@ -309,21 +308,21 @@ namespace Prsi
 
             Playing = Values.Players.Opponent;
 
-            using NpgsqlCommand cmd = new("select tahni(@jmenoin, @hesloin, @tahin)", Values.Connection);
-            cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-            cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            cmd.Parameters.AddWithValue("@tahin", card.Name + ChangeTo);
-            await cmd.ExecuteNonQueryAsync();
+            //using NpgsqlCommand cmd = new("select tahni(@jmenoin, @hesloin, @tahin)", Values.Connection);
+            //cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+            //cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+            //cmd.Parameters.AddWithValue("@tahin", card.Name + ChangeTo);
+            //await cmd.ExecuteNonQueryAsync();
 
             MustPlay = false;
             VisualizePlayerCards();
 
             if (cards.Count == 0)
             {
-                using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'X')", Values.Connection);
-                cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-                cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-                await cmdKonec.ExecuteNonQueryAsync();
+                //using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'X')", Values.Connection);
+                //cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+                //cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+                //await cmdKonec.ExecuteNonQueryAsync();
             }
         }
 
@@ -379,10 +378,10 @@ namespace Prsi
         {
             Winner = Values.Players.Opponent;
 
-            using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, 'X')", Values.Connection);
-            cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-            cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            await cmd.ExecuteNonQueryAsync(Values.FormClosedToken).ContinueWith((t) => { });
+            //using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, 'X')", Values.Connection);
+            //cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+            //cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+            //await cmd.ExecuteNonQueryAsync(Values.FormClosedToken).ContinueWith((t) => { });
         }
 
         private void QuitGame()
@@ -428,21 +427,21 @@ namespace Prsi
 
             if (deck.Count > 0 || noTie)
             {
-                using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, '_{num}')", Values.Connection);
-                cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-                cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-                await cmd.ExecuteNonQueryAsync(Values.FormClosedToken);
+                //using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, '_{num}')", Values.Connection);
+                //cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+                //cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+                //await cmd.ExecuteNonQueryAsync(Values.FormClosedToken);
             }
             else await RequestTie();
         }
 
         private static async Task RequestTie()
         {
-            Listener.Tie = true;
-            using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'T')", Values.Connection);
-            cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-            cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            await cmdKonec.ExecuteNonQueryAsync();
+            //Listener.Tie = true;
+            //using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'T')", Values.Connection);
+            //cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+            //cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+            //await cmdKonec.ExecuteNonQueryAsync();
         }
 
         public void EnlargeCardsGrid()

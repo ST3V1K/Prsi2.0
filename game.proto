@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option csharp_namespace = "Prsi.Server";
+
+package server;
+
+service GameService {
+  rpc NewGame(Player) returns (GameCreateResponse) {}
+  rpc Join(GameRequest) returns (GameJoinResponse) {}
+  rpc Leave(GameRequest) returns (SuccessResponse) {}
+  rpc ListGames(Player) returns (ListGamesResponse) {}
+}
+
+message Player {
+  string name = 1;
+  string password = 2;
+}
+
+message Game {
+  string uuid = 1;
+}
+
+message GameRequest {
+  Game game = 1;
+  Player player = 2;
+}
+
+message PlayerRequest {
+  Player player = 1;
+}
+
+message GameJoinResponse {
+  string opponentName = 1;
+}
+
+message GameCreateResponse {
+  string uuid = 1;
+}
+
+message SuccessResponse {
+  bool success = 1;
+}
+
+message ListGamesResponse {
+  repeated Game games = 1;
+}

@@ -12,7 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Npgsql;
 
 namespace Prsi
 {
@@ -30,11 +29,11 @@ namespace Prsi
 
         private async void BtnReturn_Click(object sender, RoutedEventArgs e)
         {
-            using NpgsqlCommand cmd = new("select toggle_queue(@jmenoin, @hesloin, false, NULL)", Values.Connection);
-            cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-            cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            await cmd.ExecuteNonQueryAsync();
-            Switcher.Switch(Values.GetMainMenu());
+            //using NpgsqlCommand cmd = new("select toggle_queue(@jmenoin, @hesloin, false, NULL)", Values.Connection);
+            //cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
+            //cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
+            //await cmd.ExecuteNonQueryAsync();
+            //Switcher.Switch(Values.GetMainMenu());
         }
     }
 }
