@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Prsi"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-  <Grid>
+  <Grid Loaded="Grid_Loaded">
     <StackPanel>
       <Button Name="BtnReturn" VerticalAlignment="Top" HorizontalAlignment="Left" Click="BtnReturn_Click">Zpět</Button>
     </StackPanel>

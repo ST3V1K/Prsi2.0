@@ -55,7 +55,6 @@ namespace Prsi
                 PlayerName = name;
                 PlayerPassword = password;
 
-                Switcher.PageSwitcher?.Timer.Start();
                 Switcher.Switch(GetMainMenu());
 
                 Close();

@@ -21,13 +21,8 @@ namespace Prsi
                 Dispatcher.Invoke(() => lbName.Content = PlayerName);
         }
 
-        private async void BtnJoinQueue_Click(object sender, RoutedEventArgs e)
+        private void BtnJoinQueue_Click(object sender, RoutedEventArgs e)
         {
-            var response = await GameClient.NewGameAsync(ServerPlayer, deadline: Deadline);
-
-            GameUuid = Guid.Parse(response.Uuid);
-            Values.Game.SetSeed(response.Seed);
-
             Switcher.Switch(new CreateGame());
         }
 
