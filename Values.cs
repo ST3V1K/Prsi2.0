@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prsi.Server;
+using System;
 using System.Threading;
 using static Prsi.Server.GameService;
 using static Prsi.Server.PlayerService;
@@ -49,7 +50,7 @@ namespace Prsi
             {
                 if (playerName != null)
                     return playerName;
-                throw new NoNameException();
+                return string.Empty;
             }
             set => playerName = value;
         }
@@ -60,16 +61,36 @@ namespace Prsi
             {
                 if (playerPassword != null)
                     return playerPassword;
-                throw new NoNameException();
+                return string.Empty;
             }
             set => playerPassword = value;
         }
 
-        public static string Channel { get => $"{PlayerName}${PlayerPassword}"; }
+        public static Player ServerPlayer
+        {
+            get => new()
+            {
+                Name = PlayerName,
+                Password = PlayerPassword
+            };
+        }
+
+        public static Server.Game ServerGame
+        {
+            get => new()
+            {
+                Uuid = GameUuid.ToString()
+            };
+        }
+
+        internal static DateTime Deadline
+        {
+            get => DateTime.UtcNow.AddSeconds(5);
+        }
+
+        internal static Guid? GameUuid;
 
         public static bool IsFormClosed { get; set; }
-
-        public static CancellationToken FormClosedToken { get => new(IsFormClosed); }
 
         public static Game Game { get => game; }
 

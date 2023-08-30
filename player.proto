@@ -8,7 +8,7 @@ import "game.proto";
 
 service PlayerService {
   rpc Login(PlayerName) returns (PlayerPassword);
-  rpc Logout(Player) returns (SuccessResponse);
+  rpc Logout(GameRequest) returns (SuccessResponse);
 }
 
 message PlayerName {

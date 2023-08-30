@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using Grpc.Core;
+using System;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using static Prsi.Values;
@@ -36,21 +38,33 @@ namespace Prsi
                 return;
             }
 
-            var playerPassword = PlayerClient.Login(new() { Name = name });
-            var password = playerPassword?.Password;
-
-            if (string.IsNullOrEmpty(password)) 
+            try
             {
-                MessageBox.Show("Jméno je již zabrané.\nVyberte si jiné.");
-                return;
+                var response = await PlayerClient.LoginAsync(
+                    new() { Name = name },
+                    deadline: Deadline
+                    );
+                var password = response?.Password;
+
+                if (string.IsNullOrEmpty(password))
+                {
+                    MessageBox.Show("Jméno je již zabrané.\nVyberte si jiné.");
+                    return;
+                }
+
+                PlayerName = name;
+                PlayerPassword = password;
+
+                Switcher.PageSwitcher?.Timer.Start();
+                Switcher.Switch(GetMainMenu());
+
+                Close();
             }
-
-            PlayerName = name;
-            PlayerPassword = password;
-
-            Switcher.PageSwitcher?.Timer.Start();
-
-            Close();
+            catch (RpcException ex) when (ex.Status.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                Switcher.Switch(new FailedToConnect());
+                Close();
+            }
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)

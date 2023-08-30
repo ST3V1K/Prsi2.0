@@ -39,8 +39,6 @@ namespace Prsi
 
             ChangeName changeName = new() { Owner = Switcher.PageSwitcher };
             changeName.ShowDialog();
-
-            Switcher.Switch(new MainMenu());
         }
     }
 }

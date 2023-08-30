@@ -11,6 +11,6 @@
       <Button Name="BtnJoinQueue" Click="BtnJoinQueue_Click">Vytvořit hru</Button>
       <Button Name="BtnJoinGame" Click="BtnJoinGame_Click">Připojit se</Button>
     </StackPanel>
-    <Label x:Name="lbName" Style="{StaticResource LabelName}">{PlayerName}</Label>
+    <Label x:Name="lbName" Style="{StaticResource LabelName}">{Player Name}</Label>
   </Grid>
 </UserControl>

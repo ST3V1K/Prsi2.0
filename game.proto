@@ -6,9 +6,11 @@ package server;
 
 service GameService {
   rpc NewGame(Player) returns (GameCreateResponse) {}
+  rpc RemoveGame(GameRequest) returns (SuccessResponse) {}
   rpc Join(GameRequest) returns (GameJoinResponse) {}
   rpc Leave(GameRequest) returns (SuccessResponse) {}
   rpc ListGames(Player) returns (ListGamesResponse) {}
+  rpc ListGamesFiltered(FilteredGamesRequest) returns (ListGamesResponse) {}
 }
 
 message Player {
@@ -25,16 +27,19 @@ message GameRequest {
   Player player = 2;
 }
 
-message PlayerRequest {
+message FilteredGamesRequest {
   Player player = 1;
+  string filter = 2;
 }
 
 message GameJoinResponse {
   string opponentName = 1;
+  int32 seed = 2;
 }
 
 message GameCreateResponse {
   string uuid = 1;
+  int32 seed = 2;
 }
 
 message SuccessResponse {
@@ -42,5 +47,6 @@ message SuccessResponse {
 }
 
 message ListGamesResponse {
-  repeated Game games = 1;
+  repeated string gameUuids = 1;
+  repeated string playerNames = 2;
 }

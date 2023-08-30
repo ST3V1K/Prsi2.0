@@ -1,19 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using static Prsi.Values;
 
 namespace Prsi
 {
@@ -29,21 +17,18 @@ namespace Prsi
 
         public void SetName()
         {
-            try
-            {
-                Dispatcher.Invoke(() => lbName.Content = Values.PlayerName);
-            }
-            catch (NoNameException) { }
+            if (!string.IsNullOrEmpty(PlayerName))
+                Dispatcher.Invoke(() => lbName.Content = PlayerName);
         }
 
         private async void BtnJoinQueue_Click(object sender, RoutedEventArgs e)
         {
-            //Switcher.Switch(new CreateGame());
-            //using NpgsqlCommand cmd = new("select toggle_queue(@jmenoin, @hesloin, true, @seedin)", Values.Connection);
-            //cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-            //cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            //cmd.Parameters.AddWithValue("@seedin", new Random().Next(int.MaxValue / 2));
-            //await cmd.ExecuteNonQueryAsync();
+            var response = await GameClient.NewGameAsync(ServerPlayer, deadline: Deadline);
+
+            GameUuid = Guid.Parse(response.Uuid);
+            Values.Game.SetSeed(response.Seed);
+
+            Switcher.Switch(new CreateGame());
         }
 
         private void BtnJoinGame_Click(object sender, RoutedEventArgs e)

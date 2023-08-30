@@ -53,9 +53,15 @@ namespace Prsi
                 await Surrender();
         }
 
-        public void StartGame(int seed, string opponentName, bool host)
+        public void SetSeed(int seed)
         {
             r = new(seed);
+        }
+
+        public void StartGame(string opponentName, bool host, int seed = -1)
+        {
+            if (r is null)
+                r = new(seed);
             this.opponentName = opponentName;
             Dispatcher.Invoke(() => txtNames.Text = $"{Values.PlayerName}\n×\n{opponentName}");
 
