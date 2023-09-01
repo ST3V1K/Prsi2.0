@@ -1,5 +1,7 @@
+using System;
 using System.IO;
 using System.Windows.Media.Imaging;
+using static Prsi.Server.Card.Types.Color;
 
 namespace Prsi
 {
@@ -19,5 +21,15 @@ namespace Prsi
 
             return img;
         }
+
+        public static string GetCardName(this Server.Card card) => 
+            card.Color switch
+            {
+                Spades => "l",
+                Hearts => "s",
+                Diamonds => "k",
+                Clubs => "ž",
+                _ => throw new NotImplementedException()
+            } + card.Value;
     }
 }

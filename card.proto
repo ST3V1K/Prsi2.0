@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option  csharp_namespace = "Prsi.Server";
+option go_package = "./server";
+package server;
+
+import "game.proto";
+
+service CardService {
+  rpc Play(PlayCardRequest) returns (SuccessResponse);
+  rpc Draw(DrawCardRequest) returns (SuccessResponse);
+  rpc Stand(StandRequest) returns (SuccessResponse);
+}
+
+message PlayCardRequest {
+  Player player = 1;
+  Game game = 2;
+  Card card = 3;
+}
+
+message DrawCardRequest {
+  Player player = 1;
+  Game game = 2;
+  int32 draw = 3;
+}
+
+message StandRequest {
+  Player player = 1;
+  Game game = 2;
+}

@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using static Prsi.Server.GameService;
 using static Prsi.Server.PlayerService;
+using static Prsi.Server.CardService;
 
 namespace Prsi
 {
@@ -19,6 +20,7 @@ namespace Prsi
 
         private static GameServiceClient? gameClient;
         private static PlayerServiceClient? playerClient;
+        private static CardServiceClient? cardClient;
 
         internal static GameServiceClient GameClient
         {
@@ -39,6 +41,16 @@ namespace Prsi
                 throw new();
             }
             set => playerClient = value;
+        }
+        internal static CardServiceClient CardClient
+        {
+            get
+            {
+                if (cardClient is not null)
+                    return cardClient;
+                throw new();
+            }
+            set => cardClient = value;
         }
 
         private static readonly Game game = new();

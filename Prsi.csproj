@@ -19,6 +19,7 @@
   <ItemGroup>
     <Protobuf Include="game.proto" GrpcServices="Client" />
     <Protobuf Include="player.proto" GrpcServices="Client" />
+    <Protobuf Include="card.proto" GrpcServices="Client" />
   </ItemGroup>
 
   <ItemGroup>

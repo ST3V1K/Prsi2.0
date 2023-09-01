@@ -1,4 +1,7 @@
+using System;
 using System.Windows.Media.Imaging;
+
+using static Prsi.Server.Card.Types.Color;
 
 namespace Prsi
 {
@@ -9,6 +12,18 @@ namespace Prsi
         public BitmapImage BitmapImage { get; init; }
 
         public char ColorCode { get; init; }
+
+        public Server.Card.Types.Color Color
+        {
+            get => ColorCode switch
+            {
+                'l' => Spades,
+                's' => Hearts,
+                'k' => Diamonds,
+                'ž' => Clubs,
+                _ => throw new NotImplementedException()
+            };
+        }
 
         public int Number { get; init; }
 

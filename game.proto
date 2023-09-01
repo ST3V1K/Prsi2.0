@@ -1,16 +1,16 @@
 syntax = "proto3";
 
-option csharp_namespace = "Prsi.Server";
-
+option  csharp_namespace = "Prsi.Server";
+option go_package = "./server";
 package server;
 
 service GameService {
-  rpc NewGame(Player) returns (stream GameCreateResponse) {}
-  rpc RemoveGame(GameRequest) returns (SuccessResponse) {}
-  rpc Join(GameRequest) returns (GameJoinResponse) {}
-  rpc Leave(GameRequest) returns (SuccessResponse) {}
-  rpc ListGames(Player) returns (ListGamesResponse) {}
-  rpc ListGamesFiltered(FilteredGamesRequest) returns (ListGamesResponse) {}
+  rpc NewGame(Player) returns (stream GameStream);
+  rpc RemoveGame(GameRequest) returns (SuccessResponse);
+  rpc Join(GameRequest) returns (stream GameStream);
+  rpc Leave(GameRequest) returns (SuccessResponse);
+  rpc ListGames(Player) returns (ListGamesResponse);
+  rpc ListGamesFiltered(FilteredGamesRequest) returns (ListGamesResponse);
 }
 
 message Player {
@@ -32,14 +32,12 @@ message FilteredGamesRequest {
   string filter = 2;
 }
 
-message GameJoinResponse {
-  string opponentName = 1;
-  int32 seed = 2;
-}
-
-message GameCreateResponse {
+message GameStream {
   string uuid = 1;
-  int32 seed = 2;
+  int32 seed = 3;
+  optional string opponentName = 2;
+  optional Card card = 4;
+  optional int32 draw = 5;
 }
 
 message SuccessResponse {
@@ -49,4 +47,16 @@ message SuccessResponse {
 message ListGamesResponse {
   repeated string gameUuids = 1;
   repeated string playerNames = 2;
+}
+
+message Card {
+  enum Color {
+    Hearts = 0;
+    Spades = 1;
+    Diamonds = 2;
+    Clubs = 3;
+  }
+
+  Color color = 1;
+  int32 value = 2;
 }

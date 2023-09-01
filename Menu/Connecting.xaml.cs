@@ -30,6 +30,7 @@ namespace Prsi
 
                 GameClient = new GameService.GameServiceClient(channel);
                 PlayerClient = new PlayerService.PlayerServiceClient(channel);
+                CardClient = new CardService.CardServiceClient(channel);
             }
             catch
             {

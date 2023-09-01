@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using Grpc.Core;
+using System;
+using System.Windows;
 using System.Windows.Controls;
+using static Prsi.Listener;
 using static Prsi.Values;
 
 namespace Prsi
@@ -20,7 +23,8 @@ namespace Prsi
 
         private async void BtnJoin_Click(object sender, RoutedEventArgs e)
         {
-            var response = await GameClient.JoinAsync(new()
+
+            call = GameClient.Join(new()
             {
                 Game = new()
                 {
@@ -29,8 +33,12 @@ namespace Prsi
                 Player = ServerPlayer
             });
 
-            Values.Game.StartGame(response.OpponentName, false, response.Seed);
+            await call.ResponseStream.MoveNext();
+            GameUuid = Guid.Parse(gameId);
+            Values.Game.StartGame(call.ResponseStream.Current.OpponentName, false, call.ResponseStream.Current.Seed);
             Switcher.Switch(Values.Game);
+
+            backgroundWorker.RunWorkerAsync();
         }
     }
 }

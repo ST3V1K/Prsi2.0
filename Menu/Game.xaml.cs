@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Google.Protobuf.WellKnownTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Media;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using static Prsi.Values;
 
 namespace Prsi
 {
@@ -92,7 +94,7 @@ namespace Prsi
             }
 
             if (host) SetPlaying();
-            else Playing = Values.Players.Opponent;
+            else Playing = Players.Opponent;
 
             VisualizeDeck();
             VisualizePlayerCards();
@@ -107,8 +109,8 @@ namespace Prsi
             {
                 var color = Playing switch
                 {
-                    Values.Players.Player => Colors.Green,
-                    Values.Players.Opponent => Colors.Red,
+                    Players.Player => Colors.Green,
+                    Players.Opponent => Colors.Red,
                     _ => Colors.Black,
                 };
                 ellipse.Fill = new SolidColorBrush(color);
@@ -246,8 +248,15 @@ namespace Prsi
 
         public async void DrawCard(int amount = 1)
         {
-            if (r == null || Playing == Values.Players.Opponent)
+            if (r == null || Playing == Players.Opponent)
                 return;
+
+            await CardClient.DrawAsync(new()
+            {
+                Player = ServerPlayer,
+                Game = ServerGame,
+                Draw = amount
+            }, deadline: Deadline);
 
             for (int i = 0; i < amount; i++)
             {
@@ -260,14 +269,14 @@ namespace Prsi
                 deck.RemoveAt(index);
                 cards.Add(card);
             }
-            Playing = Values.Players.Opponent;
+            Playing = Players.Opponent;
             VisualizeDeck();
             VisualizePlayerCards();
         }
 
         public async void DrawCardForEnemy(int amount = 1)
         {
-            if (r == null || Playing == Values.Players.Player)
+            if (r == null || Playing == Players.Player)
                 return;
 
             for (int i = 0; i < amount; i++)
@@ -286,10 +295,10 @@ namespace Prsi
 
         public async void PlayCard(Card card)
         {
-            if (Playing == Values.Players.Opponent) return;
+            if (Playing == Players.Opponent) return;
             if (!card.CanBePlayed(LastPlayed)) return;
 
-            var _card = Values.Cards.Where(c => c.Name == card.Name).First();
+            var _card = Cards.Where(c => c.Name == card.Name).First();
 
             cards.RemoveAll(c => c.Name == card.Name);
             thrownOut.Add(_card);
@@ -312,13 +321,17 @@ namespace Prsi
             if (card.Number == 7)
                 StackedCards += 2;
 
-            Playing = Values.Players.Opponent;
+            Playing = Players.Opponent;
 
-            //using NpgsqlCommand cmd = new("select tahni(@jmenoin, @hesloin, @tahin)", Values.Connection);
-            //cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-            //cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            //cmd.Parameters.AddWithValue("@tahin", card.Name + ChangeTo);
-            //await cmd.ExecuteNonQueryAsync();
+            await CardClient.PlayAsync(new()
+            {
+                Player = ServerPlayer,
+                Game = ServerGame,
+                Card = new()
+                {
+                    Color = card.Color
+                }
+            }, deadline: Deadline);
 
             MustPlay = false;
             VisualizePlayerCards();
@@ -334,7 +347,7 @@ namespace Prsi
 
         public void RemoveCardFromDeck(string name)
         {
-            if (Playing == Values.Players.Player) return;
+            if (Playing == Players.Player) return;
 
             Card? card = Values.Cards.Where(c => c.Name == name).FirstOrDefault();
             if (card == null) return;
@@ -374,7 +387,7 @@ namespace Prsi
 
         public void SetPlaying()
         {
-            Playing = Values.Players.Player;
+            Playing = Players.Player;
             ChangeColorPlaying();
             using SoundPlayer sound = new(Properties.Resources.beep);
             sound.Play();
@@ -382,7 +395,7 @@ namespace Prsi
 
         public async Task Surrender()
         {
-            Winner = Values.Players.Opponent;
+            Winner = Players.Opponent;
 
             //using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, 'X')", Values.Connection);
             //cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
@@ -401,7 +414,7 @@ namespace Prsi
 
         private async void BtnCannotPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (Playing == Values.Players.Opponent) return;
+            if (Playing == Players.Opponent) return;
 
             if (MustPlay)
             {
@@ -420,8 +433,14 @@ namespace Prsi
             }
             else if (LastPlayed?.Number == 14 && LastPlayed?.CanPlay != true)
             {
+                await CardClient.StandAsync(new()
+                {
+                    Player = ServerPlayer,
+                    Game = ServerGame
+                }, deadline: Deadline);
+
                 noTie = true;
-                Playing = Values.Players.Opponent;
+                Playing = Players.Opponent;
             }
             else
                 DrawCard();
@@ -433,10 +452,6 @@ namespace Prsi
 
             if (deck.Count > 0 || noTie)
             {
-                //using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, '_{num}')", Values.Connection);
-                //cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-                //cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-                //await cmd.ExecuteNonQueryAsync(Values.FormClosedToken);
             }
             else await RequestTie();
         }
@@ -462,7 +477,7 @@ namespace Prsi
 
         public void Win()
         {
-            Winner = Values.Players.Player;
+            Winner = Players.Player;
             MessageBox.Show($"Vyhrál {Values.PlayerName}");
             QuitGame();
         }
@@ -470,14 +485,14 @@ namespace Prsi
         public void Lose()
         {
             VisualizeOpponentCards();
-            Winner = Values.Players.Opponent;
+            Winner = Players.Opponent;
             MessageBox.Show($"Vyhrál {Values.Game.opponentName}");
             QuitGame();
         }
 
         public void Draw()
         {
-            Winner = Values.Players.None;
+            Winner = Players.None;
             MessageBox.Show($"Remíza");
             QuitGame();
         }

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Reflection.PortableExecutable;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using static Prsi.Listener;
 using static Prsi.Values;
 
 namespace Prsi
@@ -22,6 +21,7 @@ namespace Prsi
         private void BtnReturn_Click(object sender, RoutedEventArgs e)
         {
             Switcher.Switch(GetMainMenu());
+            backgroundWorker.CancelAsync();
         }
 
         private async void Grid_Loaded(object sender, RoutedEventArgs e)

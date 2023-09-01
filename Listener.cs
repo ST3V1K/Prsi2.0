@@ -1,3 +1,5 @@
+using Grpc.Core;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -9,8 +11,79 @@ namespace Prsi
 {
     static class Listener
     {
+        static Listener()
+        {
+            backgroundWorker.DoWork += Listen;
+        }
+
         public static bool CannotPlay { get; set; }
         public static bool Tie { get; set; }
+
+        public static BackgroundWorker backgroundWorker = new();
+
+        public static AsyncServerStreamingCall<Server.GameStream> call;
+
+        public static async void Listen(object sender, DoWorkEventArgs e)
+        {
+            while (await call.ResponseStream.MoveNext())
+            {
+                var stream = call.ResponseStream.Current;
+
+                if (stream.Card is not null) // Play
+                {
+                    if (Values.Game.LastPlayed == null) return;
+
+                    if (Values.Game.LastPlayed.Name == stream.Card.GetCardName()) return;
+
+                    //if (payload is [_, '1', '2', char color])
+                    //    Values.Game.ChangeTo = color;
+                    //else
+                    //    Values.Game.ChangeTo = null;
+
+                    if (stream.Card.Value == 7)
+                        Values.Game.StackedCards += 2;
+
+                    if (Values.Game.LastPlayed?.Name != stream.Card.GetCardName())
+                        Values.Game.RemoveCardFromDeck(stream.Card.GetCardName());
+                }
+                else if (stream.HasDraw) // Draw
+                {
+                    if (CannotPlay)
+                    {
+                        CannotPlay = false;
+                        return;
+                    }
+
+                    if (Values.Game.LastPlayed?.Number != 14 || Values.Game.LastPlayed?.CanPlay == true)
+                        Values.Game.DrawCardForEnemy(stream.Draw);
+
+                    if (Values.Game.LastPlayed == null) return;
+
+                    Values.Game.LastPlayed.CanPlay = true;
+                    Values.Game.StackedCards = 0;
+                    Values.Game.SetPlaying();
+
+                    CannotPlay = false;
+                }
+                else // Stand
+                {
+                    if (CannotPlay)
+                    {
+                        CannotPlay = false;
+                        return;
+                    }
+
+                    if (Values.Game.LastPlayed == null) return;
+
+                    Values.Game.LastPlayed.CanPlay = true;
+                    Values.Game.StackedCards = 0;
+                    Values.Game.SetPlaying();
+
+                    CannotPlay = false;
+                }
+            }
+        }
+
 
         //public static void HandleListen(object o, NpgsqlNotificationEventArgs e)
         //{
