@@ -9,6 +9,7 @@ service GameService {
   rpc RemoveGame(GameRequest) returns (SuccessResponse);
   rpc Join(GameRequest) returns (stream GameStream);
   rpc Leave(GameRequest) returns (SuccessResponse);
+  rpc RequestTie(GameRequest) returns (SuccessResponse);
   rpc ListGames(Player) returns (ListGamesResponse);
   rpc ListGamesFiltered(FilteredGamesRequest) returns (ListGamesResponse);
 }
@@ -38,6 +39,7 @@ message GameStream {
   optional string opponentName = 2;
   optional Card card = 4;
   optional int32 draw = 5;
+  optional bool tie = 6;
 }
 
 message SuccessResponse {
@@ -59,4 +61,5 @@ message Card {
 
   Color color = 1;
   int32 value = 2;
+  optional Color changeTo = 3;
 }

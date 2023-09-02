@@ -15,14 +15,7 @@ namespace Prsi
 
         public Server.Card.Types.Color Color
         {
-            get => ColorCode switch
-            {
-                'l' => Spades,
-                's' => Hearts,
-                'k' => Diamonds,
-                'ž' => Clubs,
-                _ => throw new NotImplementedException()
-            };
+            get => ColorCode.ToColor();
         }
 
         public int Number { get; init; }

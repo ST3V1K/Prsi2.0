@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Media;
@@ -20,7 +19,7 @@ namespace Prsi
 
         public Card? LastPlayed { get; private set; }
 
-        public Values.Players? Winner { get; set; }
+        public Players? Winner { get; set; }
 
         private Random? r = null;
 
@@ -32,7 +31,7 @@ namespace Prsi
 
         public int CardsCount { get => cards.Count; }
 
-        private Values.Players? Playing = null;
+        private Players? Playing = null;
 
         private string? opponentName;
 
@@ -323,14 +322,22 @@ namespace Prsi
 
             Playing = Players.Opponent;
 
+            Server.Card serverCard = ChangeTo is null ? new()
+            {
+                Color = card.Color,
+                Value = card.Number
+            } : new()
+            {
+                Color = card.Color,
+                Value = card.Number,
+                ChangeTo = ((char)ChangeTo).ToColor()
+            };
+
             await CardClient.PlayAsync(new()
             {
                 Player = ServerPlayer,
                 Game = ServerGame,
-                Card = new()
-                {
-                    Color = card.Color
-                }
+                Card = serverCard
             }, deadline: Deadline);
 
             MustPlay = false;
@@ -338,10 +345,7 @@ namespace Prsi
 
             if (cards.Count == 0)
             {
-                //using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'X')", Values.Connection);
-                //cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-                //cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-                //await cmdKonec.ExecuteNonQueryAsync();
+                Win();
             }
         }
 
@@ -349,7 +353,7 @@ namespace Prsi
         {
             if (Playing == Players.Player) return;
 
-            Card? card = Values.Cards.Where(c => c.Name == name).FirstOrDefault();
+            Card? card = Cards.Where(c => c.Name == name).FirstOrDefault();
             if (card == null) return;
 
             EnemyCardCount--;
@@ -397,10 +401,11 @@ namespace Prsi
         {
             Winner = Players.Opponent;
 
-            //using NpgsqlCommand cmd = new($"select tahni(@jmenoin, @hesloin, 'X')", Values.Connection);
-            //cmd.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-            //cmd.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            //await cmd.ExecuteNonQueryAsync(Values.FormClosedToken).ContinueWith((t) => { });
+            await GameClient.LeaveAsync(new()
+            {
+                Game = ServerGame,
+                Player = ServerPlayer
+            });
         }
 
         private void QuitGame()
@@ -422,12 +427,10 @@ namespace Prsi
                 return;
             }
 
-            int num = 0;
             bool noTie = false;
 
             if (LastPlayed?.Number == 7)
             {
-                num = StackedCards;
                 DrawCard(StackedCards == 0 ? 1 : StackedCards);
                 StackedCards = 0;
             }
@@ -447,22 +450,21 @@ namespace Prsi
 
             if (LastPlayed != null)
                 LastPlayed.CanPlay = true;
-            Listener.CannotPlay = true;
+
             ChangeColorPlaying();
 
-            if (deck.Count > 0 || noTie)
-            {
-            }
-            else await RequestTie();
+            if (deck.Count == 0 && !noTie)
+                await RequestTie();
         }
 
         private static async Task RequestTie()
         {
-            //Listener.Tie = true;
-            //using NpgsqlCommand cmdKonec = new("select tahni(@jmenoin, @hesloin, 'T')", Values.Connection);
-            //cmdKonec.Parameters.AddWithValue("@jmenoin", Values.PlayerName);
-            //cmdKonec.Parameters.AddWithValue("@hesloin", Values.PlayerPassword);
-            //await cmdKonec.ExecuteNonQueryAsync();
+            Listener.Tie = true;
+            await GameClient.RequestTieAsync(new()
+            {
+                Game = ServerGame,
+                Player = ServerPlayer
+            }, deadline: Deadline);
         }
 
         public void EnlargeCardsGrid()
@@ -478,7 +480,7 @@ namespace Prsi
         public void Win()
         {
             Winner = Players.Player;
-            MessageBox.Show($"Vyhrál {Values.PlayerName}");
+            MessageBox.Show($"Vyhrál {PlayerName}");
             QuitGame();
         }
 

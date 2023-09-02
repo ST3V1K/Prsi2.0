@@ -28,8 +28,28 @@ namespace Prsi
                 Spades => "l",
                 Hearts => "s",
                 Diamonds => "k",
-                Clubs => "ž",
-                _ => throw new NotImplementedException()
+                Clubs => "z",
+                _ => throw new ArgumentException()
             } + card.Value;
+
+        public static Server.Card.Types.Color ToColor(this char c) =>
+            c switch
+            {
+                'l' => Spades,
+                's' => Hearts,
+                'k' => Diamonds,
+                'z' => Clubs,
+                _ => throw new ArgumentException()
+            };
+
+        public static char ToChar(this Server.Card.Types.Color color) =>
+            color switch
+            {
+                Spades => 'l',
+                Hearts => 's',
+                Diamonds => 'k',
+                Clubs => 'z',
+                _ => throw new ArgumentException()
+            };
     }
 }
