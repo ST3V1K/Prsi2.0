@@ -14,7 +14,7 @@ namespace Prsi
             Player, Opponent, None
         }
 
-        internal const string SERVER_ADDRESS = "http://10.0.0.3:5001";
+        internal const string SERVER_ADDRESS = "http://localhost:5001";
         private static string? playerName;
         private static string? playerPassword;
 

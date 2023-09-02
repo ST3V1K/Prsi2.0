@@ -54,20 +54,14 @@ namespace Prsi
                 await Surrender();
         }
 
-        public void SetSeed(int seed)
+        public void StartGame(string opponentName, bool host, int seed)
         {
             r = new(seed);
-        }
-
-        public void StartGame(string opponentName, bool host, int seed = -1)
-        {
-            if (r is null)
-                r = new(seed);
             this.opponentName = opponentName;
             Dispatcher.Invoke(() => txtNames.Text = $"{Values.PlayerName}\n×\n{opponentName}");
 
             ClearData();
-            deck = ((Card[])Values.Cards.Clone()).ToList();
+            deck = ((Card[])Cards.Clone()).ToList();
 
             Card firstCard;
             while ((firstCard = deck[r.Next(deck.Count)]).Number == 12) ;
@@ -387,6 +381,7 @@ namespace Prsi
             EnemyCardCount = 0;
             StackedCards = 0;
             MustPlay = false;
+            LastPlayed = null;
         }
 
         public void SetPlaying()
@@ -408,13 +403,21 @@ namespace Prsi
             });
         }
 
-        private void QuitGame()
+        private async void QuitGame()
         {
+            await GameClient.LeaveAsync(new()
+            {
+                Game = ServerGame,
+                Player = ServerPlayer
+            });
+
+            Listener.call?.Dispose();
+
             IsRunning = false;
 
             ClearData();
             deck.Clear();
-            Switcher.Switch(Values.GetMainMenu());
+            Switcher.Switch(GetMainMenu());
         }
 
         private async void BtnCannotPlay_Click(object sender, RoutedEventArgs e)

@@ -21,14 +21,17 @@ namespace Prsi
 
         private async void Grid_Loaded(object sender, RoutedEventArgs e)
         {
+            if (call is not null)
+                call.Dispose();
+
             call = GameClient.NewGame(ServerPlayer);
 
             await call.ResponseStream.MoveNext();
             GameUuid = Guid.Parse(call.ResponseStream.Current.Uuid);
-            Values.Game.SetSeed(call.ResponseStream.Current.Seed);
+            var seed = call.ResponseStream.Current.Seed;
 
             await call.ResponseStream.MoveNext();
-            Values.Game.StartGame(call.ResponseStream.Current.OpponentName, true);
+            Values.Game.StartGame(call.ResponseStream.Current.OpponentName, true, seed);
             Switcher.Switch(Values.Game);
 
             backgroundWorker.RunWorkerAsync();

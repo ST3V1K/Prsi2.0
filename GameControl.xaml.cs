@@ -23,18 +23,18 @@ namespace Prsi
 
         private async void BtnJoin_Click(object sender, RoutedEventArgs e)
         {
+            if (call is not null)
+                call.Dispose();
+
+            GameUuid = Guid.Parse(gameId);
 
             call = GameClient.Join(new()
             {
-                Game = new()
-                {
-                    Uuid = gameId
-                },
+                Game = ServerGame,
                 Player = ServerPlayer
             });
 
             await call.ResponseStream.MoveNext();
-            GameUuid = Guid.Parse(gameId);
             Values.Game.StartGame(call.ResponseStream.Current.OpponentName, false, call.ResponseStream.Current.Seed);
             Switcher.Switch(Values.Game);
 
